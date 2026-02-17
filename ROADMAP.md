@@ -82,10 +82,67 @@ All 4 foundation contracts deployed to Arbitrum Sepolia on 15 Feb 2026:
 
 ## International Expansion
 
-| Phase | Jurisdiction | Timeline |
-|-------|-------------|----------|
-| 1 | Georgia LLC | Q2 2026 |
-| 2 | UAE DIFC / Singapore | 2027+ |
+| Phase | Jurisdiction | Timeline | Purpose |
+|-------|-------------|----------|---------|
+| 1 | Georgia LLC | Q2-Q3 2026 | Bank accounts, Stripe integration, crypto compliance |
+| 2 | UAE DIFC / Singapore | 2027+ | International scaling, institutional partnerships |
+
+**Geographic Constraints**:
+- Uzbekistan lacks Stripe/PayPal support — crypto is the only monetization path pre-relocation
+- Georgia LLC required for fiat payment rails and mainstream business infrastructure
+- Relocation path: Georgia → UAE → Singapore (aligns with Web3 + traditional finance needs)
 
 **Business Model**: Foundation (.org) open source + Enterprise (.com) B2B
 **Beachhead Market**: Quantum physics researchers, expanding to other disciplines
+
+---
+
+## Fundraising Strategy
+
+### Pre-Seed Round (Target: Q2-Q3 2026)
+- **Amount**: $150K (9-month runway)
+- **Use of Funds**:
+  - Team: 70% (2-3 core developers)
+  - Infrastructure: 15% (hosting, RPC, analytics)
+  - Security: 10% (external audit, bug bounties)
+  - Legal: 5% (Georgia LLC, compliance)
+
+### a16z CSX Speedrun SR007 (Target: Q3-Q4 2026)
+- **Program**: Season 7 (acceptance rate <0.4%)
+- **Requirement KPIs**:
+  - 500+ active users (current: ~50)
+  - 100+ GitHub stars (current: ~10)
+  - $1K+ MRR or equivalent traction
+- **Timeline**: Application after Phase 3 launch on Arbitrum mainnet
+- **Strategy**: Demonstrate technical depth (Rust/Stylus) + scientific rigor + early traction
+
+### Grant Diversification
+Avoid single-point dependency: combine Arbitrum grants (Stylus Sprint, Audit Subsidy, Trailblazer), Gitcoin QF, and Ethereum Foundation academic funding.
+
+---
+
+## Market Context
+
+### Competitive Landscape
+**Key Competitor: Phylo** (closest analog)
+- **Funding**: $13.5M Series A (led by a16z crypto, January 2024)
+- **Focus**: Biology / genomics research platform
+- **Traction**: 7,000+ research labs, peer-reviewed papers published
+- **Validation**: Proves "Scientific OS" category viability and investor appetite
+
+**DIU Positioning**: "First DeSci Platform for Physics Education" — different discipline, different pedagogy (interactive 3D simulations vs. static datasets).
+
+### DeSci Market Data (2024-2025)
+- Market capitalization surged **2,640%** in 2024 to **$1B+**
+- **180+ active projects** competing for attention
+- Academic adoption: **3/10** maturity (still early)
+- Funding concentrates in top 3-4 projects; mid-tier struggles
+- Mainstream media largely ignores DeSci (niche community focus)
+
+### Market Timing Warning
+> "Window to differentiate is narrowing."
+
+- 180+ projects in survival mode post-hype cycle
+- Technical differentiation (Rust/Stylus, scientific accuracy) is critical
+- First-mover advantage in physics education vertical must be captured in 2026
+- Grant funding environment competitive but accessible with strong execution

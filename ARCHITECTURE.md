@@ -51,6 +51,36 @@ cargo stylus check --features registry        # Check single contract WASM
 
 ---
 
+## Platform Architecture
+
+### 3-Mode UX (see ADR D-015)
+```
+Explorer Mode (sandbox) → Laboratory Mode (guided) → Research Mode (AI + export)
+```
+- **Explorer**: Free-form simulation sandbox, no login required
+- **Laboratory**: Structured experiments with progress tracking (requires auth)
+- **Research**: AI assistant + paper export + collaboration (requires token)
+
+### AI Assistant Architecture
+MCP-based multi-server design:
+- **Physics Server** — simulation control, equation validation
+- **Knowledge Server** — RAG pipeline (Qdrant vector DB), curriculum context
+- **Progress Server** — learning analytics, adaptive recommendations
+- **Targets**: <2s response latency, >90% physics accuracy
+
+### Design System
+- **Colors**: quantum-blue (`#0066FF`), wave-purple (`#6B46C1`)
+- **Typography**: Inter (UI), JetBrains Mono (code/equations), KaTeX (math rendering)
+- **Personas**: Student, Researcher, Educator, Curious Explorer
+- **Source**: `_workspace/Local-Working-Docs/DeSci/DIU Phase 0 MVP/UI-UX Requirements/`
+
+### User Flow References
+88+ user cases across 10 categories documented:
+- Auth flow, Experiment flow, AI interaction, Progress tracking, NFT mint
+- **Source**: `_workspace/Local-Working-Docs/DeSci/Dialog/07-02-26/Завершённая документация/`
+
+---
+
 ## Architecture Decision Records
 
 ### D-007: Stylus/Rust over Solidity (3 Feb 2026)
@@ -93,6 +123,21 @@ cargo stylus check --features registry        # Check single contract WASM
 **Decision**: IPFS for Phase 1 (standard, free pinning via Pinata/nft.storage).
 **Consequence**: Content-addressed, but pinning required. Arweave under review with Kirill.
 
+### D-015: 3-Mode UX Architecture (5 Feb 2026)
+**Context**: Platform needs to serve both casual visitors and serious researchers.
+**Decision**: Three progressive access modes — Explorer (sandbox), Laboratory (guided), Research (AI + export).
+**Consequence**: Clear upgrade path for users; each mode maps to a different auth/token requirement.
+
+### D-016: Web3 as Infrastructure, not Product (31 Jan 2026)
+**Context**: DeSci projects risk alienating mainstream users with "blockchain-first" positioning.
+**Decision**: Core product = simulations + AI (80%), Web3 = infrastructure layer (20%). Never position as "blockchain platform."
+**Consequence**: Lower barrier to entry; Web3 benefits (credentials, tokens) without Web3 friction.
+
+### D-017: Tech Stack Evolution (historical)
+**Context**: Project migrated through three blockchain stacks.
+**Decision**: Casper Network (2024) → Solidity/Foundry (Jan 2026) → Rust/Stylus (Feb 2026).
+**Consequence**: Explains deprecated `contracts/` directory. Current stack is final — Rust/Stylus only.
+
 ---
 
 ## Solidity -> Stylus Migration Patterns
@@ -124,6 +169,16 @@ cargo stylus check --features registry        # Check single contract WASM
 | Sybil Resistance | ORCID verification in DIURegistry |
 | Replay Prevention | Nonce-based (see P-006) |
 
+### Pre-Audit Summary (10 Feb 2026)
+**Rating**: B+ (internal assessment)
+**Critical gaps before mainnet**:
+1. No multi-sig for admin functions (severity: critical)
+2. No universal pause mechanism across all contracts
+3. Centralized ORCID verification (single point of failure)
+4. No rate limiting on XP/reputation operations
+
+**Target**: External audit by May 2026 (see P-009).
+
 For detailed security analysis, see `diu-contracts/docs/SECURITY_AUDIT.md`.
 
 ---
@@ -149,6 +204,12 @@ For detailed security analysis, see `diu-contracts/docs/SECURITY_AUDIT.md`.
 ### P-009: Audit Firm Selection
 **Question**: Which firms have Rust/WASM smart contract experience?
 **Impact**: Audit quality, cost, timeline for mainnet.
+
+### P-010: Dual-Token Economy ($DIU + $SCI)
+**Context**: Current DIUToken is interim single ERC-20. Long-term design envisions two tokens.
+**Proposed**: $DIU (governance, 1B fixed supply) + $SCI (utility, 500M + 2%/yr inflation).
+**Timeline**: Phase 3+ (2027). Current DIUToken may become $DIU or be migrated.
+**Impact**: Tokenomics design, migration strategy, regulatory implications.
 
 ---
 
