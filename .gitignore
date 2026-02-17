@@ -1,0 +1,4 @@
+_workspace/
+target/
+*.swp
+.DS_Store
