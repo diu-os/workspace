@@ -1,6 +1,6 @@
 # DIU OS — Architecture & Decisions
 
-**Last updated**: 17 February 2026
+**Last updated**: 18 February 2026
 
 ---
 
@@ -67,6 +67,46 @@ MCP-based multi-server design:
 - **Knowledge Server** — RAG pipeline (Qdrant vector DB), curriculum context
 - **Progress Server** — learning analytics, adaptive recommendations
 - **Targets**: <2s response latency, >90% physics accuracy
+
+#### Принципы проектирования MCP-серверов (Phase 2-3)
+> Source: _workspace/references/from-prompts-to-platforms-part1.pdf (Katarya, Feb 2026)
+
+**Messaging — потоковая передача, не request-response:**
+- Progressive feedback обязателен: пока Physics Server считает симуляцию, агент
+  выдаёт interim-ответы ("Вычисляю траекторию..."). Критично для <2s perceived latency.
+- Все взаимодействия User↔Agent и Agent↔Agent персистируются в mailbox-структурах
+  (granular access control, совместимо с D-016).
+
+**Memory — rolling window + episodic persistence:**
+- Учебные сессии растягиваются на недели. Progress Server обязан персистировать
+  историю без полной ре-контекстуализации при следующем входе.
+- Rolling window: ~10 последних turns в активном контексте. Старый контекст
+  вносит шум без улучшения качества.
+- RAG grounding: Knowledge Server (Qdrant) дополняет знания модели актуальным
+  прогрессом пользователя в реальном времени.
+
+**Right-sizing models — не один LLM для всего:**
+- Intent classification → SLM (быстро, детерминировано, дёшево)
+- Equation validation → Physics Server (специализированный инструмент)
+- Генерация объяснений → полный LLM (только здесь нужна generative breadth)
+- Embedding generation, feature precomputation → асинхронные offline pipelines
+
+**Prompt management — промпты как versioned code:**
+- Каждый промпт привязан к версии модели. Апгрейд модели ≠ лучший результат автоматически.
+- Динамическая инъекция: прогресс пользователя + текущий модуль + результаты
+  симуляции подставляются в шаблон в runtime.
+- Промпты хранятся отдельно от кода — быстрая итерация без redeploy.
+
+**Agent Mesh:**
+- Orchestrator маршрутизирует задачи к специализированным sub-агентам.
+- Стандартизированный A2A протокол между Physics/Knowledge/Progress серверами.
+- Никаких прямых связей между серверами — только через Orchestrator.
+
+**Safety Guardrails (multi-stage):**
+- Input: блокировать prompt injection (особенно Research Mode — открытый ввод)
+- Planning: валидировать план агента ДО выполнения действий
+- Output: фильтровать физически некорректные утверждения (>90% accuracy target)
+- Trust tiers: Explorer (мягкие) → Laboratory (средние) → Research (строгие)
 
 ### Design System
 - **Colors**: quantum-blue (`#0066FF`), wave-purple (`#6B46C1`)
@@ -137,6 +177,14 @@ MCP-based multi-server design:
 **Context**: Project migrated through three blockchain stacks.
 **Decision**: Casper Network (2024) → Solidity/Foundry (Jan 2026) → Rust/Stylus (Feb 2026).
 **Consequence**: Explains deprecated `contracts/` directory. Current stack is final — Rust/Stylus only.
+
+### D-018: MCP Agent Mesh Architecture (18 Feb 2026)
+**Context**: AI Assistant нужен для Research Mode. Требования: <2s latency, >90% physics accuracy.
+**Decision**: Orchestrator-based mesh: один Orchestrator + три специализированных MCP Server.
+  Нет прямых A2A связей между серверами. Right-sizing: SLM для classification, LLM для generation.
+  Rolling window ~10 turns. Промпты — versioned assets, не строки в коде.
+**Consequence**: Масштабируется и изолировано, но требует стандартизированного A2A протокола.
+**Source**: _workspace/references/from-prompts-to-platforms-part1.pdf
 
 ---
 

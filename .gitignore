@@ -2,3 +2,10 @@ _workspace/
 target/
 *.swp
 .DS_Store
+
+# Private keys and secrets — NEVER commit
+*.key
+*.pem
+.env.local
+.env.production
+.secrets/

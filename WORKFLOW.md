@@ -3,7 +3,7 @@
 Guide for effective work with Claude Code in the DIU OS project.
 Based on best practices from billion-token teams and security research.
 
-**Last updated**: 17 February 2026
+**Last updated**: 18 February 2026
 
 ---
 
@@ -149,6 +149,50 @@ You can't prevent all malicious inputs. Instead — verify the RESULT:
 - `cargo clippy` — any warnings?
 - `cargo stylus check` — does WASM compile?
 - Review diff before commit — what exactly changed?
+
+### Безопасность локальной среды — Claude Code + Deployer Key (Linux)
+> Source: _workspace/references/how-to-secure-autonomous-tools.pdf (Machupalli, Feb 2026)
+> Принцип: treat Claude Code as potentially hostile from day one.
+
+#### Статус deployer ключа
+- Ключ НЕ существовал на момент проверки (18 Feb 2026)
+- Создан в ~/.keys/diu-deployer с правами 600
+- ~/.keys/ директория с правами 700
+- Никогда не коммитить в git (защищено через .gitignore)
+
+#### Создание ключа (Linux, единоразово)
+```bash
+mkdir -p ~/.keys && chmod 700 ~/.keys
+echo "0xTWOY_PRIVATE_KEY" > ~/.keys/diu-deployer
+chmod 600 ~/.keys/diu-deployer
+# Проверка:
+ls -la ~/.keys/diu-deployer  # должно быть -rw------- (600)
+```
+
+#### Альтернатива: Linux Keyring через secret-tool
+```bash
+sudo apt install libsecret-tools
+secret-tool store --label="DIU Deployer Key" service diu-os account deployer
+# Использование в деплое:
+secret-tool lookup service diu-os account deployer > /tmp/key && \
+  cargo stylus deploy --private-key-path /tmp/key ... && \
+  rm /tmp/key
+```
+
+#### Мониторинг исходящих соединений (Linux)
+- **OpenSnitch** — аналог Little Snitch для Linux: github.com/evilsocket/opensnitch
+- **iptables logging**: `sudo iptables -A OUTPUT -j LOG --log-prefix "OUTBOUND: "`
+- Просматривать логи еженедельно: `sudo journalctl -k | grep OUTBOUND`
+
+#### Приоритеты по срокам
+
+| Срок | Действие | Статус |
+|------|----------|--------|
+| Сейчас (P0) | ~/.keys/diu-deployer создан с правами 600 | ⬜ |
+| Phase 2 | Установить OpenSnitch для мониторинга | ⬜ |
+| Phase 2 | Dedicated claude_runner user для изоляции | ⬜ |
+| Phase 3 mainnet | Hardware wallet (Ledger) + multi-sig (P-007) | ⬜ |
+| Phase 3 mainnet | HashiCorp Vault для audit log secret access | ⬜ |
 
 ---
 
