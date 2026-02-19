@@ -80,9 +80,22 @@ For architecture decisions and migration patterns, see `ARCHITECTURE.md`.
 - **P1**: Prepare Stylus Sprint grant application
 - **P2**: wagmi/Web3 frontend integration
 
+## Model Strategy
+Default: Sonnet for all daily work.
+- Haiku (claude-haiku-4-5): /pr commits, clippy fixes, doc comments, formatting
+- Sonnet (claude-sonnet-4-6): feature development, tests, grant writing, frontend
+- Opus (claude-opus-4-6): new contract architecture (DIUProgress, DIUCrowdfunding),
+  security review with Kirill, complex Stylus debugging, ADR authoring
+- opusplan: use when starting a new contract or major refactor
+  (Opus plans → Sonnet implements automatically)
+
+Check model anytime: /status
+Switch mid-session: /model claude-haiku-4-5 | claude-sonnet-4-6 | claude-opus-4-6 | opusplan
+
 ## Key Commands
 ```bash
 # Session
+/daily-reset                          # Daily checkpoint: save log, load context, print plan
 /catchup                              # Read changed files, get up to speed
 /status                               # Overview of all repos and contracts
 /check-contract                       # clippy + test + WASM check
