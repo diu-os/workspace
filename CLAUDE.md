@@ -14,17 +14,17 @@ DIU OS is a decentralized Scientific Operating System. Phase 0 MVP: quantum phys
 - Domain-Driven Design (DDD) + Event-Driven Architecture (EDA)
 - "Last information wins" — newer docs override older ones
 
-## Current Status (17 Feb 2026)
-**Phase 1 COMPLETE** — all 4 contracts deployed to Arbitrum Sepolia (15 Feb 2026):
+## Current Status (19 Feb 2026)
+**Phase 1 COMPLETE** — all 4 contracts redeployed to Arbitrum Sepolia (19 Feb 2026) with `initialize()` pattern:
 
 | Contract | Address | Tests | WASM |
 |----------|---------|-------|------|
-| DIURegistry | `0x3873828826a5e7768d2ad934b8466f817d5d5d07` | 26 | 20.9KB |
-| DIUReputation | `0x10696cc645b4a9adbdede4a1e3d515621140a83c` | 34 | 19.7KB |
-| DIUAchievements | `0x72bbe907b62ac1d964610f7019aa19b986986535` | 32 | 22.9KB |
-| DIUToken | `0x35ec6ca36f7e9b1d35ffe8e74e78a5882f899ce2` | 47 | 17.3KB |
+| DIURegistry | `0x49e1b11e1037e74113a7c0ccc41e3042d4691018` | 28 | 21.3KB |
+| DIUReputation | `0x8740f9d110133ff5efa0fb562e62ab92a466cdc5` | 36 | 20.0KB |
+| DIUAchievements | `0x1a9783ba7966c0e7299af7ee2228e19028d8ea7e` | 34 | 23.2KB |
+| DIUToken | `0xbbd9a558c049482f1be45399fec4a4c9dc1c810e` | 49 | 17.7KB |
 
-Deployer: `0x67bB4D1895D9A736F9e6076529B468ba05aeD150` | Total: **139 tests**
+Deployer: `0x67bB4D1895D9A736F9e6076529B468ba05aeD150` | Total: **147 tests**
 
 **Next (Phase 2)**: DIUProgress contract, security review with Kirill, backend API, grant applications.
 
