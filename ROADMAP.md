@@ -1,14 +1,14 @@
 # DIU OS — Roadmap
 
-**Last updated**: 17 February 2026
+**Last updated**: 22 February 2026
 
 ---
 
 ## Smart Contracts Phases
 
-### Phase 1: Foundation (Feb-Mar 2026) — COMPLETE
-All 4 foundation contracts deployed to Arbitrum Sepolia on 15 Feb 2026:
-- DIURegistry (26 tests), DIUReputation (34), DIUAchievements (32), DIUToken (47) = 139 tests total
+### Phase 1: Foundation (Feb 2026) — COMPLETE ✅
+All 4 contracts deployed and redeployed to Arbitrum Sepolia (19 Feb 2026, `initialize()` pattern):
+- DIURegistry (28 tests, 21.3KB), DIUReputation (36, 20.0KB), DIUAchievements (34, 23.2KB), DIUToken (49, 17.7KB) = **147 tests total**
 
 ### Phase 2: Extension (Apr-May 2026)
 | Week | Task | Deliverable |
