@@ -3,7 +3,7 @@
 Guide for effective work with Claude Code in the DIU OS project.
 Based on best practices from billion-token teams and security research.
 
-**Last updated**: 18 February 2026
+**Last updated**: 22 February 2026
 
 ---
 
@@ -188,7 +188,7 @@ secret-tool lookup service diu-os account deployer > /tmp/key && \
 
 | Срок | Действие | Статус |
 |------|----------|--------|
-| Сейчас (P0) | ~/.keys/diu-deployer создан с правами 600 | ⬜ |
+| ~~Сейчас (P0)~~ | ~/.keys/diu-deployer создан с правами 600 | ✅ (Phase 1 deployed) |
 | Phase 2 | Установить OpenSnitch для мониторинга | ⬜ |
 | Phase 2 | Dedicated claude_runner user для изоляции | ⬜ |
 | Phase 3 mainnet | Hardware wallet (Ledger) + multi-sig (P-007) | ⬜ |
