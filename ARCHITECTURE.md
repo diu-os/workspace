@@ -1,6 +1,6 @@
 # DIU OS — Architecture & Decisions
 
-**Last updated**: 18 February 2026
+**Last updated**: 22 February 2026 — Phase 1 COMPLETE (redeployed 19 Feb with `initialize()` pattern)
 
 ---
 
@@ -34,7 +34,7 @@ Phase 3 (2027+):
 ### Build System — Feature-Gated
 Each contract is behind a Cargo feature flag. Only one `#[entrypoint]` active at a time:
 ```bash
-cargo test                                    # All 139 tests
+cargo test                                    # All 147 tests
 cargo stylus check --features registry        # Check single contract WASM
 ```
 
@@ -138,10 +138,10 @@ MCP-based multi-server design:
 **Decision**: `StorageMap<Address, StorageBool>` for roles (owner, admin, authorized).
 **Consequence**: Simple, auditable, but must be reimplemented per contract.
 
-### D-010: Non-Upgradable Phase 1 Deployment (15 Feb 2026)
-**Context**: Proxy patterns for Stylus are immature; Kirill reviewing options.
-**Decision**: Deploy without proxy for Phase 1 testnet.
-**Consequence**: Simpler deployment, but redeploy required for contract changes.
+### D-010: Non-Upgradable Phase 1 Deployment (19 Feb 2026)
+**Context**: Proxy patterns for Stylus are immature; Kirill reviewing options (P-005).
+**Decision**: Deploy without proxy for Phase 1 testnet. Redeployed 19 Feb 2026 with `initialize()` pattern (constructor bug fix — `msg::sender()` returns `0x00` in Stylus WASM).
+**Consequence**: Simpler deployment, but redeploy required for contract changes. Proxy decision deferred to Phase 2.
 
 ### D-011: ERC-721 for Achievements (12 Feb 2026)
 **Context**: Badges could be soulbound (non-transferable) or standard NFTs.
