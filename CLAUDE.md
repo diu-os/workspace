@@ -14,7 +14,7 @@ DIU OS is a decentralized Scientific Operating System. Phase 0 MVP: quantum phys
 - Domain-Driven Design (DDD) + Event-Driven Architecture (EDA)
 - "Last information wins" — newer docs override older ones
 
-## Current Status (19 Feb 2026)
+## Current Status (22 Feb 2026)
 **Phase 1 COMPLETE** — all 4 contracts redeployed to Arbitrum Sepolia (19 Feb 2026) with `initialize()` pattern:
 
 | Contract | Address | Tests | WASM |
@@ -103,7 +103,7 @@ Switch mid-session: /model claude-haiku-4-5 | claude-sonnet-4-6 | claude-opus-4-
 /new-contract                         # Create new contract from template
 
 # Smart Contracts (from diu-contracts/)
-cargo test                            # All 139 tests
+cargo test                            # All 147 tests
 cargo clippy -- -D warnings           # Strict lint (0 warnings required)
 cargo stylus check --endpoint https://sepolia-rollup.arbitrum.io/rpc
 cargo stylus deploy --endpoint https://sepolia-rollup.arbitrum.io/rpc \
