@@ -43,10 +43,48 @@ All 4 contracts deployed and redeployed to Arbitrum Sepolia (19 Feb 2026, `initi
 | **Arbitrum Stylus Sprint** | 5M ARB pool | P0 | Apr 2026 | Preparing |
 | **Arbitrum Audit Subsidy** | $10M ARB pool | P0 | After Phase 2 | After security review |
 | **Trailblazer AI Grant** | $1M pool | P1 | After Phase 2 | Research |
-| **Gitcoin Grants** | QF matching | P1 | Q2 2026 | Preparing |
+| **Gitcoin GG25** | QF matching | P1 | Q2 2026 | Preparing — см. ниже |
 | **Ethereum Foundation** | $2M academic | P2 | Q3 2026 | Research |
 
 **Excluded**: FunDeSci (trust issues — permanent exclusion).
+
+### Gitcoin GG25 — Детальная стратегия (Q2 2026)
+
+**Ключевой факт**: DeSci больше НЕ является отдельным доменом в Gitcoin Grants (с GG24, Oct 2025).
+Позиционирование под DeSci = автоматический отказ.
+
+**Целевые домены (в порядке приоритета):**
+
+1. **Public Goods R&D / AI For Public Goods** (P0)
+   - Позиционирование: open-source симуляции квантовой физики = public good,
+     AI-тьютор = AI for public goods (образование), SDG 4 Quality Education
+   - Заявление в заявке: "DIU OS — open-source scientific education platform:
+     3D quantum physics simulations + AI tutor + decentralized on-chain credentials"
+   - НЕ упоминать DeSci в первом предложении — сначала "public good" + "education"
+
+2. **Dev Tooling & Infrastructure** (P1)
+   - Позиционирование: Rust/Stylus паттерны из diu-contracts/ как tooling
+     для Arbitrum-разработчиков (SECURITY_AUDIT.md, BUSINESS_LOGIC_ANALYSIS.md —
+     это реальный вклад в экосистему)
+   - Один профиль на builder.gitcoin.co покрывает оба домена одновременно
+
+**Механика QF (критично для стратегии):**
+- Число доноров важнее суммы: 50 доноров × $2 > 1 донор × $100 по matching
+- 1 DAI от 10 людей может дать до 400 DAI matching
+- Нужна широкая community-мобилизация: Twitter, Farcaster, профессора, студенты
+
+**Технический процесс:**
+- Профиль: builder.gitcoin.co (один профиль → несколько раундов)
+- Платформа: Giveth.io (партнёр Gitcoin с GG24, QF-провайдер)
+- Passport: passport.gitcoin.co — верифицировать GitHub (139 тестов),
+  Twitter, контракты на Arbiscan
+
+**Мониторинг:**
+- Домены GG25 объявляются через голосование GTC-холдеров на gov.gitcoin.co
+- Следить за анонсами за 4–6 недель до открытия раунда
+- Matching-партнёры прошлых раундов: VitaDAO (DeSci!), EF, Protocol Labs, a16z
+
+**Исключено**: FunDeSci (permanent exclusion, см. выше в ROADMAP.md)
 
 ---
 

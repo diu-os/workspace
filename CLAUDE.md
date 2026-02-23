@@ -78,7 +78,12 @@ For architecture decisions and migration patterns, see `ARCHITECTURE.md`.
 - **P0**: DIUProgress contract design
 - **P1**: Backend API (Axum + alloy + SIWE auth + PostgreSQL)
 - **P1**: Prepare Stylus Sprint grant application
+- **P1**: Создать профиль на builder.gitcoin.co (не ждать открытия GG25)
+- **P1**: Оптимизировать Gitcoin Passport на passport.gitcoin.co
 - **P2**: wagmi/Web3 frontend integration
+- **P2**: Мониторить gov.gitcoin.co — анонс доменов GG25 (за 4–6 нед. до раунда)
+- **P2**: Собрать impact metrics: MAU physics.diu-os.org, отзывы профессоров,
+  GitHub stars (нужно для QF-кампании)
 
 ## Model Strategy
 Default: Sonnet for all daily work.
