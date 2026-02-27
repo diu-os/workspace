@@ -23,10 +23,11 @@ DIU OS is a decentralized Scientific Operating System. Phase 0 MVP: quantum phys
 | DIUReputation | `0x8740f9d110133ff5efa0fb562e62ab92a466cdc5` | 36 | 20.0KB |
 | DIUAchievements | `0x1a9783ba7966c0e7299af7ee2228e19028d8ea7e` | 34 | 23.2KB |
 | DIUToken | `0xbbd9a558c049482f1be45399fec4a4c9dc1c810e` | 49 | 17.7KB |
+| DIUProgress | `0xb1c4edc73aae322f62cda57f84f303761ca3e347` | 24 | 19.0KB |
 
-Deployer: `0x67bB4D1895D9A736F9e6076529B468ba05aeD150` | Total: **147 tests**
+Deployer: `0x67bB4D1895D9A736F9e6076529B468ba05aeD150` | Total: **171 tests**
 
-**Next (Phase 2)**: DIUProgress contract, security review with Kirill, backend API, grant applications.
+**Next (Phase 2)**: Security review with Kirill, backend API, grant applications. DIUProgress ✅ deployed 27 Feb 2026.
 
 ## Tech Stack
 | Component | Stack |
@@ -75,7 +76,7 @@ For architecture decisions and migration patterns, see `ARCHITECTURE.md`.
 
 ## Current Sprint (Phase 2 Prep)
 - **P0**: Security review with Kirill (nonces, proxy, audit firms)
-- **P0**: DIUProgress contract design
+- **P0**: DIUProgress contract design ✅ (27 Feb 2026)
 - **P0**: Добавить ADR D-019–D-023 в ARCHITECTURE.md ✅ (27 Feb 2026)
 - **P0**: Создать _workspace/grants/WEIL_VALIDATION.md ✅ (27 Feb 2026)
 - **P1**: Backend API (Axum + alloy + SIWE auth + PostgreSQL)
@@ -113,7 +114,7 @@ Switch mid-session: /model claude-haiku-4-5 | claude-sonnet-4-6 | claude-opus-4-
 /new-contract                         # Create new contract from template
 
 # Smart Contracts (from diu-contracts/)
-cargo test                            # All 147 tests
+cargo test                            # All 171 tests
 cargo clippy -- -D warnings           # Strict lint (0 warnings required)
 cargo stylus check --endpoint https://sepolia-rollup.arbitrum.io/rpc
 cargo stylus deploy --endpoint https://sepolia-rollup.arbitrum.io/rpc \
