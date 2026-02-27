@@ -74,13 +74,14 @@ Deployer: `0x67bB4D1895D9A736F9e6076529B468ba05aeD150` | Total: **171 tests**
 For detailed contract APIs, storage layouts, and security patterns, see `diu-contracts/README.md` and `diu-contracts/docs/`.
 For architecture decisions and migration patterns, see `ARCHITECTURE.md`.
 
-## Current Sprint (Phase 2 Prep)
+## Current Sprint (Phase 2)
 - **P0**: Security review with Kirill (nonces, proxy, audit firms)
 - **P0**: DIUProgress contract design ✅ (27 Feb 2026)
+- **P0**: DIUProgress implement + deploy ✅ (27 Feb 2026) — `0xb1c4edc73aae322f62cda57f84f303761ca3e347`
 - **P0**: Добавить ADR D-019–D-023 в ARCHITECTURE.md ✅ (27 Feb 2026)
 - **P0**: Создать _workspace/grants/WEIL_VALIDATION.md ✅ (27 Feb 2026)
 - **P1**: Backend API (Axum + alloy + SIWE auth + PostgreSQL)
-- **P1**: MCP Physics Server stub (параллельно с DIUProgress — ADR D-020)
+- **P1**: MCP Physics Server stub (ADR D-020)
 - **P1**: Prepare Stylus Sprint grant application
 - **P1**: Gitcoin GG25 application draft (AI For Public Goods positioning)
 - **P1**: Создать профиль на builder.gitcoin.co (не ждать открытия GG25)
