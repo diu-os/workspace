@@ -73,6 +73,10 @@ All 4 contracts deployed and redeployed to Arbitrum Sepolia (19 Feb 2026, `initi
 - 1 DAI от 10 людей может дать до 400 DAI matching
 - Нужна широкая community-мобилизация: Twitter, Farcaster, профессора, студенты
 
+**Validation:** Positioning "AI For Public Goods" подтверждена Kevin Weil (OpenAI VP, a16z speedrun,
+Feb 2026) — наш MCP Ensemble Mesh соответствует best practices OpenAI. Использовать как credibility
+signal в заявке: "Архитектура следует паттернам, рекомендованным VP of Science OpenAI."
+
 **Технический процесс:**
 - Профиль: builder.gitcoin.co (один профиль → несколько раундов)
 - Платформа: Giveth.io (партнёр Gitcoin с GG24, QF-провайдер)
@@ -112,9 +116,12 @@ All 4 contracts deployed and redeployed to Arbitrum Sepolia (19 Feb 2026, `initi
 |-------|------|
 | B-1 | Production Axum backend with DDD structure |
 | B-2 | SIWE (Sign-In with Ethereum) authentication |
-| B-3 | PostgreSQL + Supabase CDC for real-time |
+| B-3 | PostgreSQL + Supabase CDC for real-time + **MCP Server stub (Physics + Knowledge) — параллельно** |
 | B-4 | alloy integration for blockchain interaction |
-| B-5 | MCP servers (Physics simulation, Knowledge base, Progress tracking) |
+| B-5 | ~~MCP servers~~ **MOVED UP → B-3** — full MCP implementation (Progress tracking, versioned interfaces) |
+
+> **ADR D-020**: MCP scaffolding поднято с B-5 на B-3 (capability window — строить инфраструктуру
+> до готовности финального UX). Source: Kevin Weil, a16z speedrun, 26 Feb 2026.
 
 ---
 

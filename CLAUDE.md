@@ -76,10 +76,15 @@ For architecture decisions and migration patterns, see `ARCHITECTURE.md`.
 ## Current Sprint (Phase 2 Prep)
 - **P0**: Security review with Kirill (nonces, proxy, audit firms)
 - **P0**: DIUProgress contract design
+- **P0**: Добавить ADR D-019–D-023 в ARCHITECTURE.md ✅ (27 Feb 2026)
+- **P0**: Создать _workspace/grants/WEIL_VALIDATION.md ✅ (27 Feb 2026)
 - **P1**: Backend API (Axum + alloy + SIWE auth + PostgreSQL)
+- **P1**: MCP Physics Server stub (параллельно с DIUProgress — ADR D-020)
 - **P1**: Prepare Stylus Sprint grant application
+- **P1**: Gitcoin GG25 application draft (AI For Public Goods positioning)
 - **P1**: Создать профиль на builder.gitcoin.co (не ждать открытия GG25)
 - **P1**: Оптимизировать Gitcoin Passport на passport.gitcoin.co
+- **P2**: Double-slit physics core: JS → Rust/WASM rewrite (ADR D-021)
 - **P2**: wagmi/Web3 frontend integration
 - **P2**: Мониторить gov.gitcoin.co — анонс доменов GG25 (за 4–6 нед. до раунда)
 - **P2**: Собрать impact metrics: MAU physics.diu-os.org, отзывы профессоров,

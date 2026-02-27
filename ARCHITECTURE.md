@@ -186,6 +186,64 @@ MCP-based multi-server design:
 **Consequence**: Масштабируется и изолировано, но требует стандартизированного A2A протокола.
 **Source**: _workspace/references/from-prompts-to-platforms-part1.pdf
 
+### D-019: Simulation-First Research Loop (27 Feb 2026)
+**Context**: Kevin Weil (OpenAI VP) описывает научную петлю будущего: model→simulation→real world→model.
+  Наш Physics Server — первый уровень этой петли. Архитектурно это уже заложено в D-018, но не формализовано.
+**Decision**: DIU OS строит двухуровневую Research Loop:
+  - Tight loop: AI↔Simulation (<2s) — для интерактивного обучения
+  - Extended loop: AI↔Simulation↔Data Export — для серьёзных исследований (Research Mode)
+  Data export API включается в scope DIUProgress (Phase 2), не откладывается на Phase 3.
+**Consequence**: DIUProgress должен поддерживать экспорт результатов симуляций (JSON/CSV).
+  Это усиливает ценностное предложение для исследователей и дифференцирует от конкурентов.
+**Source**: Kevin Weil, a16z speedrun, 26 Feb 2026
+
+### D-020: Capability Window — Build Infrastructure Now (27 Feb 2026)
+**Context**: AI capabilities идут по кривой 0%→10%→80% за 6–12 месяцев (Kevin Weil, a16z speedrun).
+  MCP Mesh сейчас на 10% готовности. Через 6–12 месяцев AI будет отлично работать с нашей инфраструктурой
+  — но только если инфраструктура уже построена.
+**Decision**: MCP Server scaffolding поднять с B-5 на B-3 в backend roadmap.
+  Строить MCP Physics Server stub параллельно с SIWE auth и PostgreSQL (не после).
+  Ждать "готового UX" перед началом MCP = упустить capability window.
+**Consequence**: Пересмотрен порядок backend задач (см. ROADMAP.md Backend Roadmap).
+  Технический долг — минимальный; stub не требует полной реализации, только API-контракт.
+**Source**: Kevin Weil, a16z speedrun, 26 Feb 2026
+
+### D-021: Stateless WASM Simulations (27 Feb 2026)
+**Context**: Physics calculations должны масштабироваться горизонтально (см. D-019 extended loop).
+  Текущие симуляции реализованы на JS в браузере; это создаёт bottleneck для server-side вычислений.
+**Decision**: CPU-intensive physics core переписать с JS на Rust→WASM.
+  Начать с double-slit experiment (наиболее computationally intensive).
+  Все симуляции должны быть stateless: входные параметры → выходные данные, без side effects.
+  Stateless = горизонтальное масштабирование без shared state.
+**Consequence**: Усиливает "Rust everywhere" нарратив для грантовых заявок (Stylus Sprint, a16z).
+  Double-slit WASM rewrite — Phase 2 deliverable (UX-2/UX-3 period).
+**Source**: Kevin Weil, a16z speedrun, 26 Feb 2026
+
+### D-022: Ensemble Model Routing (27 Feb 2026)
+**Context**: Kevin Weil прямо указывает — слишком мало стартапов используют ensemble моделей.
+  "A lot of things today turn out best when you use an ensemble of models."
+  D-018 уже описывает right-sizing, но не фиксирует официальный паттерн routing.
+**Decision**: Официально фиксируем ensemble архитектуру:
+  - Orchestrator LLM — маршрутизация и планирование (полный LLM)
+  - IntentClassifier SLM — быстрая классификация намерений (<100ms, дешёво)
+  - PhysicsValidator — специализированный инструмент проверки уравнений
+  - KnowledgeRAG — Qdrant + embeddings для curriculum context
+  Никогда не использовать один гигантский промпт для всего.
+**Consequence**: Ensemble описывается в grant applications как технический differentiator.
+  Ссылка: "Следует best practices, рекомендованным OpenAI VP (Kevin Weil, Feb 2026)."
+**Source**: Kevin Weil, a16z speedrun, 26 Feb 2026
+
+### D-023: Progressive Capability Release via Versioned MCP Interface (27 Feb 2026)
+**Context**: Новые AI capabilities появляются каждый месяц (Weil: "And in another month, that happens again").
+  Если Orchestrator жёстко связан с конкретными MCP Server реализациями — каждый апгрейд = breaking change.
+**Decision**: Каждый MCP Server имеет versioned interface как contractual API:
+  `mcp://physics.diu-os/v1/simulate`, `mcp://knowledge.diu-os/v2/query`.
+  Новая capability = новая версия MCP Server (или новый сервер), без изменения Orchestrator.
+  Orchestrator знает только о контрактах, не о реализациях.
+**Consequence**: Plugin-архитектура для AI слоя. Соответствует "scientific LEGO blocks" нарративу.
+  Новые модели (GPT-5, Claude 4, etc.) интегрируются заменой одного сервера, не рефакторингом системы.
+**Source**: Kevin Weil, a16z speedrun, 26 Feb 2026
+
 ---
 
 ## Solidity -> Stylus Migration Patterns
