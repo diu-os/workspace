@@ -1,6 +1,6 @@
 # DIU OS — Architecture & Decisions
 
-**Last updated**: 22 February 2026 — Phase 1 COMPLETE (redeployed 19 Feb with `initialize()` pattern)
+**Last updated**: 27 February 2026 — DIUProgress deployed to Arbitrum Sepolia
 
 ---
 
@@ -15,16 +15,16 @@
 
 ### 8-Contract Ecosystem
 ```
-Phase 1 (DEPLOYED):
+Phase 1 (DEPLOYED, 19 Feb 2026):
   DIURegistry --> DIUReputation --> DIUAchievements    DIUToken
   (identity)     (XP/levels)      (NFT badges)        (ERC-20)
                        |                                  ^
                        +----------------------------------+
                          (DIUReputation -> DIUToken.mint)
 
-Phase 2 (planned):
+Phase 2 (IN PROGRESS):
   DIUProgress --> DIUReputation    DIUCrowdfunding --> DIUToken
-  (learning)     (addXP)          (funding)           (transfer)
+  (learning ✅)  (addXP)          (funding)           (transfer)
 
 Phase 3 (2027+):
   DIUGovernance <--> DIUStaking
@@ -34,7 +34,7 @@ Phase 3 (2027+):
 ### Build System — Feature-Gated
 Each contract is behind a Cargo feature flag. Only one `#[entrypoint]` active at a time:
 ```bash
-cargo test                                    # All 147 tests
+cargo test                                    # All 171 tests
 cargo stylus check --features registry        # Check single contract WASM
 ```
 
@@ -118,6 +118,22 @@ MCP-based multi-server design:
 88+ user cases across 10 categories documented:
 - Auth flow, Experiment flow, AI interaction, Progress tracking, NFT mint
 - **Source**: `_workspace/Local-Working-Docs/DeSci/Dialog/07-02-26/Завершённая документация/`
+
+---
+
+## Deployed Contracts (Arbitrum Sepolia)
+
+| Contract | Address | Deployed | Tests | WASM |
+|----------|---------|----------|-------|------|
+| DIURegistry | `0x49e1b11e1037e74113a7c0ccc41e3042d4691018` | 19 Feb 2026 | 28 | 21.3KB |
+| DIUReputation | `0x8740f9d110133ff5efa0fb562e62ab92a466cdc5` | 19 Feb 2026 | 36 | 20.0KB |
+| DIUAchievements | `0x1a9783ba7966c0e7299af7ee2228e19028d8ea7e` | 19 Feb 2026 | 34 | 23.2KB |
+| DIUToken | `0xbbd9a558c049482f1be45399fec4a4c9dc1c810e` | 19 Feb 2026 | 49 | 17.7KB |
+| DIUProgress | `0xb1c4edc73aae322f62cda57f84f303761ca3e347` | 27 Feb 2026 | 24 | 19.0KB |
+
+**Deployer**: `0x67bB4D1895D9A736F9e6076529B468ba05aeD150`
+**Total tests**: 171
+**DIUProgress init params**: `reputation=0x8740...cdc5`, `max_experiment_id=10`, `max_module_id=5`
 
 ---
 
