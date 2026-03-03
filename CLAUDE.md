@@ -29,7 +29,7 @@ DIU OS is a decentralized Scientific Operating System. Phase 0 MVP: quantum phys
 Deployer: `0x67bB4D1895D9A736F9e6076529B468ba05aeD150` | Total: **171 tests**
 
 **Next (Phase 2)**: Security review with Kirill, backend API, grant applications. DIUProgress ✅ deployed 27 Feb 2026.
-**QAT Status**: QAT.md создан 03 Mar 2026. Fitness functions — P0 задача перед следующим контрактом.
+**QAT Status**: QAT.md создан 03 Mar 2026. Fitness functions ✅ + load-tests ✅ завершены 03 Mar 2026.
 
 ## Tech Stack
 | Component | Stack |
@@ -55,8 +55,8 @@ Deployer: `0x67bB4D1895D9A736F9e6076529B468ba05aeD150` | Total: **171 tests**
 │   └── rules/project-rules.md       <- Auto-applied rules
 ├── diu-contracts/                    <- ACTIVE: Stylus/Rust smart contracts (own git repo)
 │   ├── src/{lib,registry,reputation,achievements,token,progress}.rs
-│   ├── src/tests/fitness.rs          <- Architectural fitness functions (TODO: create)
-│   └── load-tests/                   <- k6 load test scripts (TODO: create)
+│   ├── src/tests/fitness.rs          <- Architectural fitness functions ✅
+│   └── load-tests/                   <- k6 load test scripts ✅
 ├── physics-tutorial/                 <- LIVE MVP (own git repo)
 │   ├── frontend/                     # React + Three.js (27 components, 3 sims, 8 langs)
 │   └── backend/                      # Axum stub (not in prod)
@@ -81,7 +81,7 @@ For detailed contract APIs, storage layouts, and security patterns, see `diu-con
 For architecture decisions and migration patterns, see `ARCHITECTURE.md`.
 
 ## Current Sprint (Phase 2)
-- **P0**: Fitness functions — `diu-contracts/src/tests/fitness.rs` + `load-tests/` (QAT.md)
+- **P0**: Fitness functions ✅ — `diu-contracts/src/tests/fitness.rs` + `load-tests/` (03 Mar 2026)
 - **P0**: Security review with Kirill (nonces, proxy, audit firms)
 - **P0**: DIUProgress contract design ✅ (27 Feb 2026)
 - **P0**: DIUProgress implement + deploy ✅ (27 Feb 2026) — `0xb1c4edc73aae322f62cda57f84f303761ca3e347`
@@ -123,7 +123,7 @@ Switch mid-session: /model claude-haiku-4-5 | claude-sonnet-4-6 | claude-opus-4-
 
 # Smart Contracts (from diu-contracts/)
 cargo test                            # All 171 tests
-cargo test --test fitness             # Only architectural fitness functions
+cargo test --test fitness --features all-contracts  # Only architectural fitness functions
 cargo clippy -- -D warnings           # Strict lint (0 warnings required)
 cargo audit                           # CVE check — run before every deploy
 cargo stylus check --endpoint https://sepolia-rollup.arbitrum.io/rpc
