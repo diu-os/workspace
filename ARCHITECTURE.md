@@ -1,6 +1,6 @@
 # DIU OS — Architecture & Decisions
 
-**Last updated**: 02 March 2026 — D-024 S3-native event streaming ADR
+**Last updated**: 04 March 2026 — D-025/D-026/D-027 security ADRs; P-005/P-006/P-007 resolved
 
 ---
 
@@ -285,13 +285,74 @@ MCP-based multi-server design:
 **Review**: Q3 2026, после выхода на mainnet.
 **Source**: https://streamhouse.app, https://github.com/gbram1/streamhouse (MIT)
 
+### D-025: No Proxy Through Phase 3; Mainnet Decision Deferred to May 2026 (04 Mar 2026)
+**Context**: P-005 analyzed across multiple sources (DeepSeek, ChatGPT, Gemini).
+  Stylus SDK 0.10.0 does NOT support `delegatecall` between WASM contracts natively.
+  No battle-tested proxy libraries exist for Stylus. No production proxy upgrades in ecosystem.
+  UUPS rejected: if `upgradeTo()` has a bug — contract permanently locked (1-person team, unacceptable risk).
+  Diamond rejected: extreme complexity, zero Stylus examples.
+**Decision**: Deploy without proxy through Phase 2 and Phase 3 testnet.
+  Mainnet proxy decision deferred to **May 2026** — evaluate SDK state at that point.
+  - If `delegatecall` WASM→WASM appears in SDK: Transparent Proxy (Rust-native).
+  - If not: deploy mainnet as immutable contracts; upgrades via new deployment + state migration.
+**Strict Storage Discipline (mandatory from Phase 2)**:
+  - Single `storage.rs` per contract — no `#[storage]` spread across files
+  - Field order FROZEN — never reorder or delete fields; add new fields to END only
+  - Reserve slots: `_reserved0..4: StorageU256` in every contract struct
+  - Storage version as first field in every contract
+**Consequence**: Maximum auditability and simplicity. Immutable mainnet is honest for DeSci users.
+**Sources**: DeepSeek (primary — confirmed delegatecall unavailable), ChatGPT, Gemini (Mar 2026)
+
+### D-026: Per-User On-Chain Nonce for Replay Prevention (04 Mar 2026)
+**Context**: P-006 analyzed. Two distinct replay surfaces:
+  (1) Network-level replay — prevented by Arbitrum's native EOA nonce.
+  (2) Logical replay — `addXP(user, 50)` called twice by buggy/compromised backend;
+  different tx hash, same business effect. Native Arbitrum nonce does NOT protect against this.
+**Decision**: Per-user on-chain nonce in DIUProgress and all future mutating contracts:
+  ```rust
+  pub user_nonces: StorageMap<Address, StorageU64>,
+  // Every mutating call: require(nonce == expected); nonce += 1;
+  ```
+  Per-action nonce rejected for Phase 2: ~30-40% higher gas, overhead unjustified while backend
+  is single-threaded. Revisit in Phase 3 when parallel backend workers appear.
+  Phase 3 meta-transactions (EIP-712): per-user nonce already in place, forward-compatible.
+**Consequence**: Protection against both network-level and logical replay from Phase 2 onward.
+**Sources**: DeepSeek (identified logical replay gap), Gemini/ChatGPT confirmed (Mar 2026)
+
+### D-027: Gnosis Safe + Differentiated Timelock for Admin Functions (04 Mar 2026)
+**Context**: P-007 analyzed. Current: single EOA `0x67bB4D...` controls pause/verify/mint
+  across all 5 contracts. Pre-audit: severity critical. Timelock alone insufficient —
+  does not protect if key is stolen. Adding Timelock at mainnet launch is dangerous:
+  first weeks require ability to hotfix critical bugs immediately.
+**Decision**:
+  | Phase | Solution | Rationale |
+  |-------|----------|-----------|
+  | Phase 2 testnet | No change | No real funds at risk |
+  | Phase 3 pre-mainnet | Gnosis Safe 2-of-3 | Mandatory before mainnet |
+  | Phase 3 mainnet stable | Safe 2-of-3 + Timelock | After system proves stable (4-6 weeks) |
+
+  Differentiated Timelock by function:
+  | Function | Timelock | Reason |
+  |----------|----------|--------|
+  | `pause()` / `unpause()` / `blacklist_address()` | ❌ None | Emergency — must be instant |
+  | `verify_user()` | ❌ None | Operational, low risk |
+  | `add_authorized_address()` | ✅ 48h | New admin = high risk |
+  | `mint_tokens()` | ✅ 48h | Token emission |
+  | `withdraw_funds()` | ✅ 48h | Asset movement |
+  | `upgrade_implementation()` | ✅ 7 days | Critical — maximum delay |
+
+  Safe configuration: 2-of-3 signers (founder hardware wallet + 2 trusted keys).
+  Key rotation procedure must be documented before mainnet.
+**Consequence**: Eliminates single-point-of-failure on admin keys before mainnet.
+**Sources**: DeepSeek (function table), all three LLMs agree on Safe 2-of-3 (Mar 2026)
+
 ---
 
 ## Solidity -> Stylus Migration Patterns
 
 | # | Solidity Pattern | Stylus Solution |
 |---|------------------|-----------------|
-| 1 | UUPS Proxy | Non-upgradable Phase 1; proxy TBD with Kirill |
+| 1 | UUPS Proxy | No proxy Phase 1-2; Transparent Proxy if SDK ready May 2026 (see D-025) |
 | 2 | OZ AccessControl | Manual `StorageMap<Address, StorageBool>` per role |
 | 3 | Initializable | `StorageBool initialized` + check in `init()` |
 | 4 | `bytes(name).length == 0` | `name.is_empty()` |
@@ -312,9 +373,9 @@ MCP-based multi-server design:
 | Reentrancy | Disabled by default in Stylus |
 | Overflow | Rust checked arithmetic (built-in) |
 | Timestamp | Block timestamp + tolerance |
-| Upgradability | TBD with Kirill (see P-005) |
+| Upgradability | No proxy Phase 1-2; decision May 2026 (see D-025) |
 | Sybil Resistance | ORCID verification in DIURegistry |
-| Replay Prevention | Nonce-based (see P-006) |
+| Replay Prevention | Per-user on-chain nonce StorageMap<Address, StorageU64> (see D-026) |
 
 ### Pre-Audit Summary (10 Feb 2026)
 **Rating**: B+ (internal assessment)
@@ -337,19 +398,16 @@ For detailed security analysis, see `diu-contracts/docs/SECURITY_AUDIT.md`.
 
 ---
 
-## Pending Decisions (Awaiting Kirill)
+## Pending Decisions
 
-### P-005: Proxy Pattern for Upgradability
-**Question**: Should Phase 2 contracts use a proxy pattern? Which one (UUPS, transparent, diamond)?
-**Impact**: Deployment strategy, storage layout constraints, gas costs.
+### ~~P-005: Proxy Pattern for Upgradability~~ → RESOLVED: ADR D-025 (04 Mar 2026)
+No proxy through Phase 2-3 testnet. Mainnet decision deferred to May 2026 pending Stylus SDK state.
 
-### P-006: Nonce-Based Replay Prevention
-**Question**: Best practices for nonces in Stylus? Per-user vs per-action nonces?
-**Impact**: XP system security, daily login integrity.
+### ~~P-006: Nonce-Based Replay Prevention~~ → RESOLVED: ADR D-026 (04 Mar 2026)
+Per-user on-chain nonce (`StorageMap<Address, StorageU64>`) in DIUProgress and all future contracts.
 
-### P-007: Multi-Sig for Admin Functions
-**Question**: Should admin functions require multi-sig in Phase 2?
-**Impact**: Centralization risk, operational complexity.
+### ~~P-007: Multi-Sig for Admin Functions~~ → RESOLVED: ADR D-027 (04 Mar 2026)
+Gnosis Safe 2-of-3 before mainnet. Differentiated Timelock added after system stabilizes (not at launch).
 
 ### P-008: IPFS vs Arweave for NFT Metadata
 **Question**: Permanent storage (Arweave) vs pinned storage (IPFS)?
