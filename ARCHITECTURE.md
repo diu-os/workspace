@@ -1,6 +1,6 @@
 # DIU OS — Architecture & Decisions
 
-**Last updated**: 27 February 2026 — DIUProgress deployed to Arbitrum Sepolia
+**Last updated**: 02 March 2026 — D-024 S3-native event streaming ADR
 
 ---
 
@@ -259,6 +259,23 @@ MCP-based multi-server design:
 **Consequence**: Plugin-архитектура для AI слоя. Соответствует "scientific LEGO blocks" нарративу.
   Новые модели (GPT-5, Claude 4, etc.) интегрируются заменой одного сервера, не рефакторингом системы.
 **Source**: Kevin Weil, a16z speedrun, 26 Feb 2026
+
+### D-024: S3-Native Event Streaming for Phase 3 Backend (02 Mar 2026)
+**Context**: Phase 3 (500+ users, Arbitrum mainnet) потребует event-driven pipeline для:
+  on-chain событий (XP, NFT mint, login streaks) → аналитика, ML-фичи для MCP серверов,
+  CDC из PostgreSQL в реальном времени. Kafka — избыточен для стартапа: broker fleet,
+  ZooKeeper/KRaft, replication, дорогой cross-AZ трафик. Исследован StreamHouse (Mar 2026)
+  как S3-native Kafka-альтернатива на Rust (MIT, hobby-проект на ранней стадии).
+**Decision**: Принять S3-native streaming как целевую архитектуру для Phase 3 backend.
+  Конкретный инструмент не фиксируется до Phase 3 — оценить зрелость в Q3 2026:
+  StreamHouse, WarpStream или AutoMQ. Требования к выбору: Rust-совместимость,
+  PostgreSQL для метаданных (совместимо с B-3), Kafka-compatible API.
+  Phase 1-2 (Axum + PostgreSQL) достаточен при <500 users — не усложнять раньше времени.
+**Consequence**: Stateless агенты + S3 заменяют broker fleet → ~80% экономия на инфраструктуре.
+  Архитектурно совместимо с D-018/D-020 (MCP серверы питаются из Progress/Physics event streams).
+  Важно: event schema проектировать в Phase 2, чтобы избежать рефакторинга при миграции.
+**Review**: Q3 2026, после выхода на mainnet.
+**Source**: https://streamhouse.app, https://github.com/gbram1/streamhouse (MIT)
 
 ---
 
