@@ -14,8 +14,8 @@ DIU OS is a decentralized Scientific Operating System. Phase 0 MVP: quantum phys
 - Domain-Driven Design (DDD) + Event-Driven Architecture (EDA)
 - "Last information wins" — newer docs override older ones
 
-## Current Status (22 Feb 2026)
-**Phase 1 COMPLETE** — all 4 contracts redeployed to Arbitrum Sepolia (19 Feb 2026) with `initialize()` pattern:
+## Current Status (27 Feb 2026)
+**Phase 1 COMPLETE** — all 5 contracts deployed to Arbitrum Sepolia with `initialize()` pattern:
 
 | Contract | Address | Tests | WASM |
 |----------|---------|-------|------|
@@ -51,7 +51,7 @@ Deployer: `0x67bB4D1895D9A736F9e6076529B468ba05aeD150` | Total: **171 tests**
 │   ├── commands-archive/             <- /deploy-testnet, /sync-repos, etc.
 │   └── rules/project-rules.md       <- Auto-applied rules
 ├── diu-contracts/                    <- ACTIVE: Stylus/Rust smart contracts (own git repo)
-│   └── src/{lib,registry,reputation,achievements,token}.rs
+│   └── src/{lib,registry,reputation,achievements,token,progress}.rs
 ├── physics-tutorial/                 <- LIVE MVP (own git repo)
 │   ├── frontend/                     # React + Three.js (27 components, 3 sims, 8 langs)
 │   └── backend/                      # Axum stub (not in prod)
@@ -63,11 +63,12 @@ Deployer: `0x67bB4D1895D9A736F9e6076529B468ba05aeD150` | Total: **171 tests**
 ```
 
 ## Contracts Summary
-4 contracts, feature-gated (one `#[entrypoint]` at a time via Cargo features):
+5 contracts, feature-gated (one `#[entrypoint]` at a time via Cargo features):
 - **DIURegistry** — User identity, ORCID linking, researcher verification
 - **DIUReputation** — XP, levels (1-5), daily streaks, leaderboard
 - **DIUAchievements** — ERC-721 NFT badges and certificates
 - **DIUToken** — ERC-20 platform token (rewards, governance)
+- **DIUProgress** — Simulation tracking, experiment completion, cross-contract XP
 
 **Access Control**: Registry(public+admin) | Reputation(public+backend) | Achievements(public+backend) | Token(public+backend+admin)
 
