@@ -13,6 +13,14 @@
 - **Testnet**: Arbitrum Sepolia
 - **Target**: wasm32-unknown-unknown
 
+### Architectural Principle: Empirical Validation First
+> Source: Pureur & Bittner "You've Generated Your MVP Using AI" (InfoQ, Feb 2026)
+
+Архитектурные решения без эмпирической валидации — гипотезы, не решения.
+**"Caveat Prompter"**: перед каждым новым контрактом — написать ADR с явными trade-offs,
+использовать как контекст промпта. Затем реализовывать.
+Полная спецификация QARs, fitness functions и тестов: **`QAT.md`**
+
 ### 8-Contract Ecosystem
 ```
 Phase 1 (DEPLOYED, 19 Feb 2026):
@@ -310,11 +318,18 @@ MCP-based multi-server design:
 
 ### Pre-Audit Summary (10 Feb 2026)
 **Rating**: B+ (internal assessment)
-**Critical gaps before mainnet**:
-1. No multi-sig for admin functions (severity: critical)
-2. No universal pause mechanism across all contracts
-3. Centralized ORCID verification (single point of failure)
-4. No rate limiting on XP/reputation operations
+**Интерпретация**: код качественный, логика верная, 171 тест.
+Есть известные structural gaps — не критичны на testnet, опасны на mainnet.
+Целевой рейтинг перед mainnet: **A** (внешний аудит пройден, все gaps закрыты).
+
+**Critical gaps — трекер закрытия** (полная спецификация в `QAT.md`):
+
+| Gap | Severity | Решение | Target | Статус |
+|-----|----------|---------|--------|--------|
+| #1 Нет multi-sig для admin | Critical | Gnosis Safe 2-of-3 | Phase 3 mainnet | ❌ Open |
+| #2 Нет universal pause | High | PauseController контракт | Phase 2 | ❌ Open |
+| #3 ORCID centralized | Medium | Verification queue + fallback | Phase 2 | ❌ Open |
+| #4 Нет XP rate limiting | Medium | Per-user daily cap в DIUReputation | Phase 2 | ❌ Open |
 
 **Target**: External audit by May 2026 (see P-009).
 
@@ -357,4 +372,5 @@ For detailed security analysis, see `diu-contracts/docs/SECURITY_AUDIT.md`.
 - Security audit notes: `diu-contracts/docs/SECURITY_AUDIT.md`
 - Business logic analysis: `diu-contracts/docs/BUSINESS_LOGIC_ANALYSIS.md`
 - Frontend architecture: `physics-tutorial/docs/ARCHITECTURE.md`
+- **QARs, fitness functions, load tests, security gaps tracker**: `QAT.md` ← NEW
 - Old Solidity reference: `contracts/` (DEPRECATED, do not modify)

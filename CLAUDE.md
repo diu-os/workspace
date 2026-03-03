@@ -12,6 +12,7 @@ DIU OS is a decentralized Scientific Operating System. Phase 0 MVP: quantum phys
 - **FunDeSci is EXCLUDED** from grant strategies
 - Scientific accuracy is paramount — peer-reviewed research only
 - Domain-Driven Design (DDD) + Event-Driven Architecture (EDA)
+- **"Caveat Prompter"** — перед новым контрактом/фичей: сначала ADR с trade-offs, потом код
 - "Last information wins" — newer docs override older ones
 
 ## Current Status (27 Feb 2026)
@@ -28,6 +29,7 @@ DIU OS is a decentralized Scientific Operating System. Phase 0 MVP: quantum phys
 Deployer: `0x67bB4D1895D9A736F9e6076529B468ba05aeD150` | Total: **171 tests**
 
 **Next (Phase 2)**: Security review with Kirill, backend API, grant applications. DIUProgress ✅ deployed 27 Feb 2026.
+**QAT Status**: QAT.md создан 03 Mar 2026. Fitness functions — P0 задача перед следующим контрактом.
 
 ## Tech Stack
 | Component | Stack |
@@ -44,6 +46,7 @@ Deployer: `0x67bB4D1895D9A736F9e6076529B468ba05aeD150` | Total: **171 tests**
 ├── WORKFLOW.md                       <- How to work with Claude Code
 ├── ROADMAP.md                        <- Phases, grants, timeline
 ├── ARCHITECTURE.md                   <- ADRs, contract design, security
+├── QAT.md                            <- Quality Architecture Testing (QARs, fitness functions, load tests)
 ├── .gitignore                        <- Ignores _workspace/, target/
 ├── _workspace/                       <- Working docs, archives (gitignored)
 ├── .claude/
@@ -51,7 +54,9 @@ Deployer: `0x67bB4D1895D9A736F9e6076529B468ba05aeD150` | Total: **171 tests**
 │   ├── commands-archive/             <- /deploy-testnet, /sync-repos, etc.
 │   └── rules/project-rules.md       <- Auto-applied rules
 ├── diu-contracts/                    <- ACTIVE: Stylus/Rust smart contracts (own git repo)
-│   └── src/{lib,registry,reputation,achievements,token,progress}.rs
+│   ├── src/{lib,registry,reputation,achievements,token,progress}.rs
+│   ├── src/tests/fitness.rs          <- Architectural fitness functions (TODO: create)
+│   └── load-tests/                   <- k6 load test scripts (TODO: create)
 ├── physics-tutorial/                 <- LIVE MVP (own git repo)
 │   ├── frontend/                     # React + Three.js (27 components, 3 sims, 8 langs)
 │   └── backend/                      # Axum stub (not in prod)
@@ -76,6 +81,7 @@ For detailed contract APIs, storage layouts, and security patterns, see `diu-con
 For architecture decisions and migration patterns, see `ARCHITECTURE.md`.
 
 ## Current Sprint (Phase 2)
+- **P0**: Fitness functions — `diu-contracts/src/tests/fitness.rs` + `load-tests/` (QAT.md)
 - **P0**: Security review with Kirill (nonces, proxy, audit firms)
 - **P0**: DIUProgress contract design ✅ (27 Feb 2026)
 - **P0**: DIUProgress implement + deploy ✅ (27 Feb 2026) — `0xb1c4edc73aae322f62cda57f84f303761ca3e347`
@@ -117,10 +123,16 @@ Switch mid-session: /model claude-haiku-4-5 | claude-sonnet-4-6 | claude-opus-4-
 
 # Smart Contracts (from diu-contracts/)
 cargo test                            # All 171 tests
+cargo test --test fitness             # Only architectural fitness functions
 cargo clippy -- -D warnings           # Strict lint (0 warnings required)
+cargo audit                           # CVE check — run before every deploy
 cargo stylus check --endpoint https://sepolia-rollup.arbitrum.io/rpc
 cargo stylus deploy --endpoint https://sepolia-rollup.arbitrum.io/rpc \
   --private-key-path ~/.keys/diu-deployer --max-fee-per-gas-gwei 0.1
+
+# Load Testing
+k6 run load-tests/basic.js            # Baseline: 50 users, p95 < 3s
+k6 run load-tests/spike.js            # Spike: 100 users (university lecture scenario)
 ```
 
 ## Coding Conventions
@@ -146,6 +158,7 @@ cargo stylus deploy --endpoint https://sepolia-rollup.arbitrum.io/rpc \
 ## See Also
 - `ROADMAP.md` — phases, grants pipeline, UX roadmap, international expansion
 - `ARCHITECTURE.md` — ADRs, contract design, security patterns, pending decisions
+- `QAT.md` — QARs registry, fitness functions, load tests, security checklist, phase checkpoints
 - `WORKFLOW.md` — Claude Code workflow, context management, security practices
 - `.claude/rules/project-rules.md` — auto-applied guardrails
 - `diu-contracts/docs/` — detailed security audit, business logic analysis
