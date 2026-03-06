@@ -1,6 +1,6 @@
 # DIU OS — Roadmap
 
-**Last updated**: 03 March 2026
+**Last updated**: 06 March 2026
 
 ---
 
@@ -169,15 +169,29 @@ signal в заявке: "Архитектура следует паттерна�
 | UX-1 | Feb-Mar 2026 | Explorer Mode improvements |
 | UX-2 | Apr-May 2026 | Laboratory Mode v1 (Modules 1-3, quizzes) |
 | UX-3 | Jun-Aug 2026 | Research Mode v1 (custom params, data export, AI) |
-| UX-4 | Q3-Q4 2026 | Web3 integration (NFTs, on-chain progress, wagmi) |
-| UX-5 | 2027 | Multi-discipline expansion |
+| UX-4 | Q3-Q4 2026 | Web3 integration (NFTs, on-chain progress, wagmi) + WebXR wrapper (ADR D-028) |
+| UX-5 | 2027 | Multi-discipline expansion + bevy/WASM native VR |
 
 ### Three UX Modes
 | Mode | Audience | Features |
 |------|----------|----------|
 | **Explorer** | Casual visitors | Free 3D simulations, quick info popups, donate button |
 | **Laboratory** | Students | Guided modules, step-by-step, quizzes, NFT achievements |
-| **Research** | Scientists | Custom params, data export, AI assistant, on-chain attribution |
+| **Research** | Scientists | Custom params, data export, AI "Quantum" assistant, on-chain attribution |
+
+### Research Mode Toolkit (UX-3, Phase 3)
+Tools и стандарты, которые поддерживает Research Mode:
+| Tool / Standard | Type | Purpose |
+|----------------|------|---------|
+| **quantrs2** | Rust crate (MIT) | Pure Rust quantum computing simulator — stateless WASM-compatible |
+| **qoqo** | Rust crate (Apache 2.0, HQS) | Quantum operations framework, gate-level simulation |
+| **OpenQASM 3.0** | Open standard (IBM) | Quantum assembly export for portability across simulators |
+| **FAIR principles** | Data standard (GO FAIR) | Findable / Accessible / Interoperable / Reusable — data export format |
+| **WebXR Device API** | W3C standard | VR/AR/MR immersive sessions (ADR D-028) |
+
+> **Note**: quantrs2 и qoqo — для Phase 3 Research Mode export (DIUProgress D-019 extended loop).
+> Пользователь экспортирует результат симуляции → JSON/OpenQASM → загружает в IBM Quantum, qoqo, etc.
+> FAIR compliance усиливает позицию для Ethereum Foundation academic grant (Q3 2026).
 
 ---
 
@@ -213,6 +227,50 @@ signal в заявке: "Архитектура следует паттерна�
 ---
 
 ## Fundraising Strategy
+
+### 3-Layer Financial Model
+
+```
+Layer 1 — Open Foundation (.org)           [NOW → Q4 2026]
+  Gitcoin GG25 QF matching                  — community funding
+  Arbitrum Stylus Sprint + Audit Subsidy    — ecosystem grants
+  Ethereum Foundation academic grant        — scientific credibility
+  Goal: 100% infrastructure covered by grants during Phase 2-3
+
+Layer 2 — Platform Subscriptions (.com)    [Q3 2026 →]
+  University site license: $500/mo per department
+  Research lab subscription: $200/mo
+  Individual researcher: $29/mo (Research Mode only)
+  Goal: $5K MRR by Q1 2027
+
+Layer 3 — Protocol ($DIU token)            [Phase 4, 2027+]
+  Token-gated Research Mode premium features
+  Governance voting (DIUGovernance contract)
+  Research funding pools (DIUCrowdfunding)
+  Goal: Protocol revenue covers Layer 2 shortfall
+```
+
+**Break-even projection**:
+- Team of 2 (~$8K/mo) + Infrastructure ($1.5K/mo) = $9.5K/mo burn
+- Grant coverage (Layer 1): ~$6K/mo equivalent through 2026
+- Break-even MRR needed: ~$3.5K (Layer 2) — target: Q4 2027 (conservative) / Q2 2027 (optimistic)
+- Pre-Seed $150K extends runway to Q1 2027 while Layer 2 grows
+
+### 90-Day KPIs (March → June 2026)
+
+| KPI | Baseline (Mar 2026) | Target (Jun 2026) | Measurement |
+|-----|---------------------|-------------------|-------------|
+| MAU (physics.diu-os.org) | ~50 | 200 | analytics.diu-os.org |
+| GitHub stars (diu-contracts) | ~10 | 50 | github.com/diu-os |
+| Grant applications submitted | 0 | 2 (Stylus Sprint + Gitcoin) | tracked |
+| Academic contacts (professors using platform) | 0 | 5 | CRM |
+| Load test documented (p95) | — | < 3s @ 50 users | k6 results |
+| Security gaps closed | 0/4 | 2/4 (#3 + #4) | SECURITY_AUDIT.md |
+| DIUCrowdfunding deployed | ❌ | ✅ Sepolia | Arbiscan |
+| builder.gitcoin.co profile | ❌ | ✅ verified | gitcoin.co |
+
+> KPI data будет использоваться как grant evidence для Stylus Sprint и Gitcoin GG25.
+> "171 unit tests, 200 MAU, p95 < 3s" — конкретные цифры сильнее общих слов.
 
 ### Pre-Seed Round (Target: Q2-Q3 2026)
 - **Amount**: $150K (9-month runway)

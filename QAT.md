@@ -1,6 +1,6 @@
 # DIU OS — Quality Architecture Testing (QAT)
 
-**Last updated**: 03 March 2026
+**Last updated**: 06 March 2026
 **Source**: Pureur & Bittner "You've Generated Your MVP Using AI" (InfoQ, Feb 2026)
 **Owner**: Barust | **Reviewer**: Kirill Taran (security layer)
 
@@ -70,12 +70,23 @@ QAT закрывает этот пробел.
 | Q-17 | Cross-contract calls задокументированы в ADR | 100% coverage | ✅ D-019 (Simulation-First Research Loop) |
 | Q-18 | Все state mutations → события | 100% | ⚠️ Проверить |
 
+### VR/AR/MR Performance (WebXR — Phase 3+, ADR D-028)
+
+| ID | Stimulus | Response | Метрика | Статус |
+|----|----------|----------|---------|--------|
+| Q-21 | Рендеринг кадра в VR-гарнитуре | Frame доставлен до deadline | frame time < 11ms (90 FPS) | ❌ Phase 3 |
+| Q-22 | Вход в иммерсивный WebXR сеанс | `immersive-vr` режим активен | cold start < 2s | ❌ Phase 3 |
+| Q-23 | Physics расчёт за кадр (stateless) | Результат получен до рендеринга | < 8ms/frame (3ms буфер) | ❌ Phase 3 |
+
+> **Целевые устройства**: Meta Quest 3 (72Hz), Apple Vision Pro (100Hz), WebXR-браузеры (Chrome 125+).
+> Q-21..Q-23 становятся обязательными перед UX-4 (ADR D-028 WebXR wrapper).
+
 ### Scientific Accuracy (специфично для DIU OS)
 
 | ID | Requirement | Метрика | Статус |
 |----|-------------|---------|--------|
 | Q-19 | Симуляции на peer-reviewed источниках | 100% sourced | ✅ Policy |
-| Q-20 | AI ответы по физике | > 90% accuracy | ❌ Phase 3 |
+| Q-20 | AI ответы по физике ("Quantum" persona) | > 90% accuracy | ❌ Phase 3 |
 
 **Легенда**: ✅ Выполнено | ⚠️ Частично | ❌ Не выполнено
 
@@ -502,7 +513,7 @@ jobs:
 ---
 
 ## See Also
-- `ARCHITECTURE.md` — ADRs (D-019 Simulation-First Research Loop, D-021 Stateless WASM Simulations)
-- `ROADMAP.md` — фазы с QAT milestones и checkpoints
+- `ARCHITECTURE.md` — ADRs (D-019 Research Loop, D-021 Stateless WASM, D-028 VR/AR/MR)
+- `ROADMAP.md` — фазы с QAT milestones, 90-day KPIs, Research Mode toolkit
 - `diu-contracts/docs/SECURITY_AUDIT.md` — детальный security анализ
 - `load-tests/` — k6 скрипты (создать в корне workspace)

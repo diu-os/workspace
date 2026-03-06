@@ -1,6 +1,6 @@
 # DIU OS — Architecture & Decisions
 
-**Last updated**: 04 March 2026 — D-025/D-026/D-027 security ADRs; P-005/P-006/P-007 resolved
+**Last updated**: 06 March 2026 — D-028 VR/AR/MR ADR; AI persona "Quantum" added
 
 ---
 
@@ -75,6 +75,19 @@ MCP-based multi-server design:
 - **Knowledge Server** — RAG pipeline (Qdrant vector DB), curriculum context
 - **Progress Server** — learning analytics, adaptive recommendations
 - **Targets**: <2s response latency, >90% physics accuracy
+
+#### AI Persona: "Quantum"
+Branded AI tutor — единая точка взаимодействия для всех трёх UX-режимов:
+- **Роль**: Physics explainer, simulation guide, research co-pilot
+- **Принципы**: Точность прежде доступности; цитирует peer-reviewed источники;
+  флагирует неуверенность ("This is an approximation: ..."); никогда не упрощает законы физики
+- **Адаптация по режиму**:
+  - *Explorer*: Аналогии, доступный язык, пробуждение любопытства
+  - *Laboratory*: Структурированные шаги, Сократовские вопросы, подсказки
+  - *Research*: Технический уровень, co-author framing, DOI-ссылки
+- **Реализация**: Orchestrator LLM с Quantum-branded system prompt + Physics Server validation
+- **Safety tier**: Explorer (мягкие) → Laboratory (средние) → Research (строгие guardrails)
+- **Идентичность**: "Quantum" — не ChatGPT-wrapper. Personality prompt версионируется как код (ADR D-023)
 
 #### Принципы проектирования MCP-серверов (Phase 2-3)
 > Source: _workspace/references/from-prompts-to-platforms-part1.pdf (Katarya, Feb 2026)
@@ -284,6 +297,40 @@ MCP-based multi-server design:
   Важно: event schema проектировать в Phase 2, чтобы избежать рефакторинга при миграции.
 **Review**: Q3 2026, после выхода на mainnet.
 **Source**: https://streamhouse.app, https://github.com/gbram1/streamhouse (MIT)
+
+### D-028: VR/AR/MR Architecture — WebXR + Rust VR Stack (06 Mar 2026)
+**Context**: 3D квантовые симуляции — идеальный контент для иммерсивного XR.
+  "Observe quantum interference inside the double-slit experiment" — compelling нарратив для грантов и медиа.
+  Текущий стек (Three.js + WebGL) поддерживает WebXR API без полного переписывания.
+  Rust/bevy — зрелый игровой движок (MIT) с нативной поддержкой WASM и WebXR.
+**Decision**:
+  - **Интерфейс-стандарт**: WebXR API (W3C) — vendor-agnostic, браузерный, охватывает VR + AR + MR
+  - **Phase 3 (Q3-Q4 2026)**: WebXR wrapper поверх Three.js симуляций (минимальные изменения)
+  - **Phase 4+ (2027)**: bevy 0.16+/WASM для нативного рендеринга (замена Three.js CPU-intensive симуляций)
+  - **GPU pipeline**: wgpu (уже в bevy) — cross-platform Metal/Vulkan/WebGPU
+  - **Целевые устройства**: Meta Quest 3 (72Hz min), Apple Vision Pro (100Hz), WebXR-браузеры
+  - **Rust VR toolkit**: `bevy` (engine), `bevy_oxr` (OpenXR bindings), `wgpu` (GPU)
+  - **Stateless invariant сохраняется** (ADR D-021): симуляция params → rendered frame, без side effects
+
+  **VR Performance Targets** (добавлены в QAT.md как Q-21..Q-23):
+  - Frame time < 11ms (90 FPS / 72Hz headset requirement)
+  - WebXR session enter < 2s (cold start, immersive-vr mode)
+  - Physics calculation < 8ms/frame (оставляет 3ms буфер на рендеринг)
+
+  **AR/MR overlay**: Three.js + WebXR AR session для наложения уравнений на реальный мир.
+  Особенно эффектно для Laboratory Mode (видеть формулы поверх реального эксперимента).
+**Consequence**: Иммерсивный XR — сильный differentiator против конкурентов (Phylo, другие DeSci).
+  "First VR quantum physics lab on blockchain" — grant-narrative для Arbitrum Trailblazer + EF.
+  Технический риск: bevy/WebXR интеграция требует device-specific testing.
+  Phase 3 entry point (WebXR wrapper) — низкий риск, проверяет спрос до полной миграции.
+**ADR Decision Matrix**:
+  | Option | Risk | Grant Appeal | Timeline |
+  |--------|------|-------------|----------|
+  | WebXR wrapper (Phase 3) | Low | High | UX-4 |
+  | bevy/WASM native (Phase 4) | Medium | Very High | 2027 |
+  | Native apps (iOS/Android) | High | Low | Rejected |
+**Review**: Phase 3 WebXR POC → decision on bevy migration (Q4 2026).
+**Source**: WebXR Device API (W3C, 2025), bevy 0.16 release notes, ADR D-021
 
 ### D-025: No Proxy Through Phase 3; Mainnet Decision Deferred to May 2026 (04 Mar 2026)
 **Context**: P-005 analyzed across multiple sources (DeepSeek, ChatGPT, Gemini).
