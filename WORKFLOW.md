@@ -3,7 +3,7 @@
 Guide for effective work with Claude Code in the DIU OS project.
 Based on best practices from billion-token teams and security research.
 
-**Last updated**: 22 February 2026
+**Last updated**: 06 March 2026
 
 ---
 
@@ -235,15 +235,18 @@ Don't block the agent while writing files — let it finish, verify on commit.
 
 ## Typical Workflows
 
-### New Contract
+### New Contract ("Caveat Prompter" rule)
 ```
-> Read CLAUDE.md, find the spec for DIUProgress.
-> Use plan mode. Show plan before coding.
+> Write ADR for DIUCrowdfunding: context, decision, trade-offs.
+  Save to ARCHITECTURE.md as D-XXX.
+[Review ADR]
+> Use plan mode. Show implementation plan before coding.
 [Approve plan]
 > Implement
 /check-contract
 /pr
 ```
+Правило: **ADR сначала, код потом**. Без ADR — не начинать.
 
 ### Bug Fix
 ```
@@ -252,10 +255,25 @@ Don't block the agent while writing files — let it finish, verify on commit.
 /check-contract
 ```
 
+### QAT Check (перед новым деплоем)
+```bash
+cargo test --test fitness --features all-contracts  # инварианты
+cargo clippy -- -D warnings                         # 0 warnings
+cargo audit                                         # 0 critical CVE
+k6 run load-tests/basic.js                          # p95 < 3s @ 50 users
+```
+
+### New ADR
+```
+> Add ADR D-0XX to ARCHITECTURE.md: [topic]
+  Use format: Context / Decision / Consequence / Source
+  Number sequentially after last ADR (current: D-028).
+```
+
 ### Post-Session Update
 ```
 > Update "Current Status" section in CLAUDE.md:
-> DIUProgress is now COMPLETE (N tests, WASM XKB)
+> [what was completed today], date 06 Mar 2026
 ```
 
 ---

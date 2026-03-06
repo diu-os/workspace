@@ -15,8 +15,8 @@ DIU OS is a decentralized Scientific Operating System. Phase 0 MVP: quantum phys
 - **"Caveat Prompter"** — перед новым контрактом/фичей: сначала ADR с trade-offs, потом код
 - "Last information wins" — newer docs override older ones
 
-## Current Status (27 Feb 2026)
-**Phase 1 COMPLETE** — all 5 contracts deployed to Arbitrum Sepolia with `initialize()` pattern:
+## Current Status (06 Mar 2026)
+**Phase 2 IN PROGRESS** — 5 contracts on Arbitrum Sepolia, security ADRs resolved, QAT foundation complete:
 
 | Contract | Address | Tests | WASM |
 |----------|---------|-------|------|
@@ -28,8 +28,10 @@ DIU OS is a decentralized Scientific Operating System. Phase 0 MVP: quantum phys
 
 Deployer: `0x67bB4D1895D9A736F9e6076529B468ba05aeD150` | Total: **171 tests**
 
-**Next (Phase 2)**: Security review with Kirill, backend API, grant applications. DIUProgress ✅ deployed 27 Feb 2026.
-**QAT Status**: QAT.md создан 03 Mar 2026. Fitness functions ✅ + load-tests ✅ завершены 03 Mar 2026.
+**QAT**: Fitness functions ✅ + load-tests ✅ (03 Mar) | Security checklist ❌ Open
+**ADRs**: D-025 (no proxy) + D-026 (nonces) + D-027 (multi-sig) ✅ resolved 04 Mar | D-028 VR/AR/MR ✅ 06 Mar
+**AI**: Persona "Quantum" architected (ARCHITECTURE.md) — implementation Phase 3
+**Docs**: 3-layer financial model + 90-day KPIs + Research Mode toolkit → ROADMAP.md (06 Mar)
 
 ## Tech Stack
 | Component | Stack |
@@ -80,24 +82,37 @@ Deployer: `0x67bB4D1895D9A736F9e6076529B468ba05aeD150` | Total: **171 tests**
 For detailed contract APIs, storage layouts, and security patterns, see `diu-contracts/README.md` and `diu-contracts/docs/`.
 For architecture decisions and migration patterns, see `ARCHITECTURE.md`.
 
-## Current Sprint (Phase 2)
-- **P0**: Fitness functions ✅ — `diu-contracts/src/tests/fitness.rs` + `load-tests/` (03 Mar 2026)
-- **P0**: Security review with Kirill (nonces, proxy, audit firms)
-- **P0**: DIUProgress contract design ✅ (27 Feb 2026)
-- **P0**: DIUProgress implement + deploy ✅ (27 Feb 2026) — `0xb1c4edc73aae322f62cda57f84f303761ca3e347`
-- **P0**: Добавить ADR D-019–D-023 в ARCHITECTURE.md ✅ (27 Feb 2026)
-- **P0**: Создать _workspace/grants/WEIL_VALIDATION.md ✅ (27 Feb 2026)
-- **P1**: Backend API (Axum + alloy + SIWE auth + PostgreSQL)
-- **P1**: MCP Physics Server stub (ADR D-020)
-- **P1**: Prepare Stylus Sprint grant application
-- **P1**: Gitcoin GG25 application draft (AI For Public Goods positioning)
-- **P1**: Создать профиль на builder.gitcoin.co (не ждать открытия GG25)
-- **P1**: Оптимизировать Gitcoin Passport на passport.gitcoin.co
-- **P2**: Double-slit physics core: JS → Rust/WASM rewrite (ADR D-021)
-- **P2**: wagmi/Web3 frontend integration
-- **P2**: Мониторить gov.gitcoin.co — анонс доменов GG25 (за 4–6 нед. до раунда)
-- **P2**: Собрать impact metrics: MAU physics.diu-os.org, отзывы профессоров,
-  GitHub stars (нужно для QF-кампании)
+## Current Sprint (Phase 2) — as of 06 Mar 2026
+
+### Завершено ✅
+- Fitness functions `diu-contracts/src/tests/fitness.rs` + `load-tests/` (03 Mar)
+- ADR D-019–D-027 в ARCHITECTURE.md (все security решения приняты)
+- ADR D-028 VR/AR/MR + AI persona "Quantum" (06 Mar)
+- QAT.md: Q-21..Q-23 VR performance targets (06 Mar)
+- ROADMAP.md: 3-layer financial model + 90-day KPIs + Research Mode toolkit (06 Mar)
+- DIUProgress deploy ✅ `0xb1c4edc73aae322f62cda57f84f303761ca3e347`
+- _workspace/grants/WEIL_VALIDATION.md ✅
+
+### Открыто — P0 (блокирует Phase 3)
+- **Security review с Кириллом** — code audit nonces/pause/ORCID (P-008/P-009 ещё открыты)
+- **Gap #2**: PauseController контракт (universal emergency stop)
+- **Gap #3**: ORCID verification queue + fallback
+- **Gap #4**: Per-user daily XP cap в DIUReputation
+- **Security checklist** по всем 5 контрактам → `diu-contracts/docs/SECURITY_AUDIT.md`
+
+### Открыто — P1
+- Backend API: Axum + alloy + SIWE auth + PostgreSQL (B-1..B-3)
+- MCP Physics Server stub параллельно с B-3 (ADR D-020)
+- Stylus Sprint grant application (Apr 2026 deadline)
+- Gitcoin GG25 draft (AI For Public Goods) + builder.gitcoin.co профиль
+- Оптимизировать Gitcoin Passport (passport.gitcoin.co)
+
+### Открыто — P2
+- DIUCrowdfunding контракт (ADR перед кодом — "Caveat Prompter")
+- Double-slit: JS → Rust/WASM rewrite (ADR D-021)
+- wagmi/Web3 frontend integration (UX-4)
+- Собрать impact metrics: MAU, отзывы профессоров, GitHub stars
+- Мониторить gov.gitcoin.co — анонс доменов GG25 (за 4–6 нед. до раунда)
 
 ## Model Strategy
 Default: Sonnet for all daily work.
