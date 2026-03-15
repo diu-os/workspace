@@ -82,7 +82,7 @@ Deployer: `0x67bB4D1895D9A736F9e6076529B468ba05aeD150` | Total: **171 tests**
 For detailed contract APIs, storage layouts, and security patterns, see `diu-contracts/README.md` and `diu-contracts/docs/`.
 For architecture decisions and migration patterns, see `ARCHITECTURE.md`.
 
-## Current Sprint (Phase 2) — as of 06 Mar 2026
+## Current Sprint (Phase 2) — as of 15 Mar 2026
 
 ### Завершено ✅
 - Fitness functions `diu-contracts/src/tests/fitness.rs` + `load-tests/` (03 Mar)
@@ -92,15 +92,22 @@ For architecture decisions and migration patterns, see `ARCHITECTURE.md`.
 - ROADMAP.md: 3-layer financial model + 90-day KPIs + Research Mode toolkit (06 Mar)
 - DIUProgress deploy ✅ `0xb1c4edc73aae322f62cda57f84f303761ca3e347`
 - _workspace/grants/WEIL_VALIDATION.md ✅
+- **Security Audit Level 1 (15 Mar 2026)**:
+  - R-1 ORCID global uniqueness — keccak256 reverse mapping, `OrcidAlreadyRegistered` error (commit `7e22b26`)
+  - P-3 `get_export_snapshot` ACL — `require_authorized()` gate (commit `7e22b26`)
+  - E-1 arithmetic overflow — `checked_add` + `ArithmeticOverflow` error (commit `7e22b26`)
+  - A-2/P-1 Accepted Risk documented — backend enforces, Phase 2 on-chain guard (commit `8c717aa`)
+  - Tests: 171 → 174, total **189** (174 unit + 15 fitness)
 
 ### Открыто — P0 (блокирует Phase 3)
 - **Security review с Кириллом** — code audit nonces/pause/ORCID (P-008/P-009 ещё открыты)
+- **E-3**: replay/nonces — P-006, ждёт решения с Кириллом (`add_xp` без дедупликации)
 - **Gap #2**: PauseController контракт (universal emergency stop)
-- **Gap #3**: ORCID verification queue + fallback
-- **Gap #4**: Per-user daily XP cap в DIUReputation
-- **Security checklist** по всем 5 контрактам → `diu-contracts/docs/SECURITY_AUDIT.md`
+- **Gap #3**: ORCID verification queue + fallback (R-3)
+- **Gap #4**: Per-user daily XP cap в DIUReputation (E-4)
 
 ### Открыто — P1
+- **Q-15**: рефакторинг App.tsx (1357 строк → компоненты <200 строк) — план готов, ждёт подтверждения
 - Backend API: Axum + alloy + SIWE auth + PostgreSQL (B-1..B-3)
 - MCP Physics Server stub параллельно с B-3 (ADR D-020)
 - Stylus Sprint grant application (Apr 2026 deadline)
