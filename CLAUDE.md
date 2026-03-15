@@ -106,14 +106,15 @@ For architecture decisions and migration patterns, see `ARCHITECTURE.md`.
 - **Q-15 Phase 2** — 3 компонента извлечены (commit `dfad267`):
   ExperimentStatsPanels, ControlsSidebar, StatsSidebar
   App.tsx: 1357 → 483 строк
+- **Q-15 Phase 3+4 ✅ ЗАКРЫТО** — хуки + SimulationCanvas (commit `ed9bb49`):
+  `useSimulationState` (17 useState + handlers), `SimulationCanvas`, `CanvasOverlayInfo`
+  App.tsx: 483 → **170 строк** (итого: 1357 → 170). Q-15 инвариант закрыт: все компоненты < 200 строк.
 
 ### Открыто — P0 (блокирует Phase 3)
 - **Security review с Кириллом** — code audit nonces/pause/ORCID (P-008/P-009 ещё открыты)
-- **Gap #3**: ORCID verification queue + fallback (R-3)
+- **Gap #3**: ORCID verification queue + fallback (R-3) ← **следующий приоритет**
 
 ### Открыто — P1
-- **Q-15 Phase 3**: извлечь хуки `useSimulationState`, `useKeyboardShortcuts`
-- **Q-15 Phase 4**: финальная очистка App.tsx до <200 строк
 - Backend API: Axum + alloy + SIWE auth + PostgreSQL (B-1..B-3)
 - MCP Physics Server stub параллельно с B-3 (ADR D-020)
 - Stylus Sprint grant application (Apr 2026 deadline)
