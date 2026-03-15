@@ -1,6 +1,6 @@
 # DIU OS — Architecture & Decisions
 
-**Last updated**: 06 March 2026 — D-028 VR/AR/MR ADR; AI persona "Quantum" added
+**Last updated**: 15 March 2026 — D-029 PauseController ADR (Gap #2)
 
 ---
 
@@ -332,6 +332,38 @@ Branded AI tutor — единая точка взаимодействия для
 **Review**: Phase 3 WebXR POC → decision on bevy migration (Q4 2026).
 **Source**: WebXR Device API (W3C, 2025), bevy 0.16 release notes, ADR D-021
 
+### D-029: PauseController — Universal Emergency Stop (15 Mar 2026)
+**Context:**
+Сейчас только DIUToken имеет механизм `pause()`/`unpause()` (admin-only, `paused: StorageBool`). Остальные 4 контракта (DIURegistry, DIUReputation, DIUAchievements, DIUProgress) не имеют pause вообще. Gap #2: при компрометации backend-ключа или обнаружении критической уязвимости нет способа остановить всю систему одним действием — нужно вручную отправить 5 отдельных транзакций. Ограничения: Stylus SDK 0.10.0 не поддерживает `delegatecall` между WASM контрактами (D-025); один `#[entrypoint]` на WASM binary; `pause()`/`unpause()` — без timelock, должны исполняться мгновенно (D-027).
+
+**Options Considered:**
+| Option | Описание | Pros | Cons |
+|--------|----------|------|------|
+| A | Отдельный PauseController контракт (registry-паттерн): каждый контракт при каждой мутации делает static call `pc.is_globally_paused()` | Единый `pause_all()` = вся система остановлена | +2000–5000 gas на каждую операцию; PauseController сам требует защиты; новый вектор отказа |
+| B | Pause в каждом контракте + backend orchestration: 5 последовательных `pause()` вызовов | Нет cross-contract overhead; изолированность | Не атомарно — окно между 1-м и 5-м вызовом; 5 отдельных подписей при ручном управлении |
+| C | Shared Rust модуль `pause.rs` + Gnosis Safe batch (D-027): одна Safe 2-of-3 подпись запускает 5 `pause()` в одной batch-транзакции | DRY-код; нет gas overhead; атомарность на уровне Safe batch; leverages D-027 | Единая точка только после настройки Safe (Phase 3) |
+
+**Decision:** Option C — shared Rust module `pause.rs` + Gnosis Safe batch.
+- Option A добавляет cross-contract call к каждой операции — неоправданный overhead для образовательной платформы; нарушает принцип "кратчайший путь отказа"
+- Option B уже фактически реализован в DIUToken, но без DRY — тот же код дублируется в 5 контрактах
+- Option C достигает "единой точки управления" на уровне Safe без runtime overhead; атомарность Safe batch достаточна для threat model (DeSci платформа, не DeFi с миллиардным TVL)
+
+Каждый контракт получает роль **`pause_guardian`** (отдельно от `admin`, Compound-style) — только этот адрес может вызывать `pause()` без timelock. Guardian = адрес Gnosis Safe на mainnet.
+
+**Consequence:**
+1. Новый модуль `diu-contracts/src/pause.rs` — `PauseStorage` + `require_not_paused()` + `require_pause_guardian()` helpers
+2. DIUToken: рефактор существующего pause → использовать `pause.rs`; добавить роль `pause_guardian`
+3. DIURegistry, DIUReputation, DIUAchievements, DIUProgress: добавить `pause.rs` storage + `require_not_paused()` в мутирующие функции + `pause_guardian` роль
+4. Storage discipline (D-025): поле `pause_guardian: StorageAddress` добавляется в конец каждого storage struct; `_reserved` слоты не трогаются
+5. `pause()` не инкрементирует nonce (D-026) — экстренная операция, не бизнес-логика
+6. `pause_guardian` может быть EOA до Phase 3 (testnet — нет реальных средств); Gnosis Safe 2-of-3 обязателен перед mainnet (синхронизировано с D-027)
+
+**Known limitation (testnet период):** До Phase 3 (Gnosis Safe не настроен): экстренная остановка = 5 отдельных backend транзакций. Known limitation testnet периода, не блокирует Phase 2.
+
+**Phase:** Phase 2 — `pause.rs` модуль + рефактор DIUToken. Остальные контракты — перед Phase 3 mainnet.
+
+---
+
 ### D-025: No Proxy Through Phase 3; Mainnet Decision Deferred to May 2026 (04 Mar 2026)
 **Context**: P-005 analyzed across multiple sources (DeepSeek, ChatGPT, Gemini).
   Stylus SDK 0.10.0 does NOT support `delegatecall` between WASM contracts natively.
@@ -435,7 +467,7 @@ Branded AI tutor — единая точка взаимодействия для
 | Gap | Severity | Решение | Target | Статус |
 |-----|----------|---------|--------|--------|
 | #1 Нет multi-sig для admin | Critical | Gnosis Safe 2-of-3 | Phase 3 mainnet | ❌ Open |
-| #2 Нет universal pause | High | PauseController контракт | Phase 2 | ❌ Open |
+| #2 Нет universal pause | High | PauseController (ADR D-029) | Phase 2 | 📋 ADR ready |
 | #3 ORCID centralized | Medium | Verification queue + fallback | Phase 2 | ❌ Open |
 | #4 Нет XP rate limiting | Medium | Per-user daily cap в DIUReputation | Phase 2 | ❌ Open |
 
