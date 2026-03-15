@@ -98,16 +98,22 @@ For architecture decisions and migration patterns, see `ARCHITECTURE.md`.
   - E-1 arithmetic overflow — `checked_add` + `ArithmeticOverflow` error (commit `7e22b26`)
   - A-2/P-1 Accepted Risk documented — backend enforces, Phase 2 on-chain guard (commit `8c717aa`)
   - Tests: 171 → 174, total **189** (174 unit + 15 fitness)
+- **ADR D-029 PauseController** + `pause.rs` shared module, DIUToken refactored (commit `0319de0`)
+- **Gap #4 (E-4)** per-user daily XP cap MAX_DAILY_XP=500 в DIUReputation (commit `75fd333`)
+- **E-3 nonces** per-user on-chain nonce в DIUReputation (commit `a340b0b`, ADR D-026)
+- **Q-15 Phase 1** — 4 компонента извлечены из App.tsx (commit `47d9488`):
+  ExperimentSelector, ModeSelectorDropdown, TunnelingControls, HydrogenControls
+- **Q-15 Phase 2** — 3 компонента извлечены (commit `dfad267`):
+  ExperimentStatsPanels, ControlsSidebar, StatsSidebar
+  App.tsx: 1357 → 483 строк
 
 ### Открыто — P0 (блокирует Phase 3)
 - **Security review с Кириллом** — code audit nonces/pause/ORCID (P-008/P-009 ещё открыты)
-- **E-3**: replay/nonces — P-006, ждёт решения с Кириллом (`add_xp` без дедупликации)
-- **Gap #2**: PauseController контракт (universal emergency stop)
 - **Gap #3**: ORCID verification queue + fallback (R-3)
-- **Gap #4**: Per-user daily XP cap в DIUReputation (E-4)
 
 ### Открыто — P1
-- **Q-15**: рефакторинг App.tsx (1357 строк → компоненты <200 строк) — план готов, ждёт подтверждения
+- **Q-15 Phase 3**: извлечь хуки `useSimulationState`, `useKeyboardShortcuts`
+- **Q-15 Phase 4**: финальная очистка App.tsx до <200 строк
 - Backend API: Axum + alloy + SIWE auth + PostgreSQL (B-1..B-3)
 - MCP Physics Server stub параллельно с B-3 (ADR D-020)
 - Stylus Sprint grant application (Apr 2026 deadline)
