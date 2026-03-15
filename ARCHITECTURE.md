@@ -1,6 +1,6 @@
 # DIU OS — Architecture & Decisions
 
-**Last updated**: 15 March 2026 — D-029 PauseController ADR (Gap #2)
+**Last updated**: 15 March 2026 — D-030 ORCID Verification Queue ADR (Gap #3)
 
 ---
 
@@ -364,6 +364,47 @@ Branded AI tutor — единая точка взаимодействия для
 
 ---
 
+### D-030: ORCID Verification Queue + Fallback (15 Mar 2026)
+**Context:**
+`link_orcid` (registry.rs:249) принимает произвольную строку как ORCID ID без валидации формата и без верификации владельца:
+- Нет проверки формата `0000-0000-0000-0000` — любая строка принимается
+- Нет связи с ORCID API — нельзя доказать, что ORCID принадлежит вызывающему адресу
+- R-1 (глобальная уникальность, commit 7e22b26) защищает от дублирования, но не от подделки
+- `verify_researcher` (admin-only) уже существует и устанавливает `is_verified` флаг — но вызывается вручную, без связи с ORCID API
+- On-chain HTTP-вызовы недоступны в Stylus SDK 0.10.0 (WASM sandbox) — любая верификация через ORCID API возможна только off-chain
+- Threat: пользователь вводит чужой ORCID ID, получает researcher credentials на чужое имя (Gap #3, R-3)
+
+**Options Considered:**
+
+| Вариант | Описание | Pros | Cons |
+|---------|----------|------|------|
+| A | On-chain оракул (Chainlink Functions) | Полностью on-chain; максимальная доверенность | Chainlink Functions не задеплоен на Arbitrum Sepolia (2026); +$0.2–0.5 per verification (LINK cost); новый вектор отказа |
+| B | Backend-side верификация через ORCID public API + on-chain `verify_researcher` | Использует существующую `is_verified` инфраструктуру; backend контролирует логику и fallback | Backend-centralized; требует backend (B-1 scope) |
+| C | Optimistic accept + async queue: `orcid_status` enum on-chain (`Pending/Verified/Rejected`) | Granular UX; retry логика на backend | Новый storage slot; `orcid_status` vs `is_verified` — дублирование семантики |
+| D | Accepted Risk — backend enforces, no on-chain verification | Zero complexity | Неприемлемо для mainnet DeSci — ORCID = научная идентичность |
+
+**Decision:** Вариант B + on-chain format guard.
+
+1. **On-chain format validation (Phase 2)**: добавить `validate_orcid_format` helper в `link_orcid` — проверять формат `\d{4}-\d{4}-\d{4}-\d{3}[\dX]` через итерацию байт (без regex). Revert `InvalidOrcidFormat` если не соответствует. Отсекает явно случайные строки без storage overhead.
+2. **Backend verification queue (Phase 2, B-1 scope)**: worker слушает `OrcidLinked` events → ORCID public API (pub.orcid.org/v3.0, free) → вызывает `verify_researcher(user)` при успехе. При неуспехе — retry с exponential backoff.
+3. **PostgreSQL queue**: таблица `orcid_verification_queue(address, orcid_id, status, attempts, next_retry_at)`. Статусы: `pending → verified | rejected | failed`. Max retries = 5, после — `rejected` с алертом.
+4. **"Linked but not verified" семантика**: `OrcidLinked` event = заявка; `is_verified` флаг = подтверждено. Система Research Mode опирается на `is_verified`. UI: "ORCID linked — verification pending (1–24h)".
+
+Вариант A отклонён: Chainlink Functions недоступен на Arbitrum Sepolia, overhead неоправдан для DeSci MVP.
+Вариант C отклонён: новый `orcid_status` storage slot избыточен — `is_verified` + `OrcidLinked` event уже дают нужную семантику.
+Вариант D неприемлем для mainnet — ORCID = научная идентичность, подделка недопустима.
+
+**Consequence:**
+1. `registry.rs` — добавить `validate_orcid_format` pure helper + `InvalidOrcidFormat` error variant; вызвать в `link_orcid` до записи
+2. Storage layout не меняется (D-025 discipline соблюдается)
+3. Backend worker `orcid_verifier` — слушает `OrcidLinked` → ORCID API → `verify_researcher` (B-1 scope)
+4. PostgreSQL таблица `orcid_verification_queue` (B-1 scope)
+5. UI статус "ORCID verification pending" для linked but `!is_verified` пользователей
+
+**Phase:** Phase 2 (on-chain format validation — текущий спринт). Backend queue — параллельно с B-1 (Axum + PostgreSQL).
+
+---
+
 ### D-025: No Proxy Through Phase 3; Mainnet Decision Deferred to May 2026 (04 Mar 2026)
 **Context**: P-005 analyzed across multiple sources (DeepSeek, ChatGPT, Gemini).
   Stylus SDK 0.10.0 does NOT support `delegatecall` between WASM contracts natively.
@@ -468,7 +509,7 @@ Branded AI tutor — единая точка взаимодействия для
 |-----|----------|---------|--------|--------|
 | #1 Нет multi-sig для admin | Critical | Gnosis Safe 2-of-3 | Phase 3 mainnet | ❌ Open |
 | #2 Нет universal pause | High | PauseController (ADR D-029) | Phase 2 | 📋 ADR ready |
-| #3 ORCID centralized | Medium | Verification queue + fallback | Phase 2 | ❌ Open |
+| #3 ORCID centralized | Medium | Format guard + backend queue (ADR D-030) | Phase 2 | 📋 ADR ready |
 | #4 Нет XP rate limiting | Medium | Per-user daily cap в DIUReputation | Phase 2 | ❌ Open |
 
 **Target**: External audit by May 2026 (see P-009).

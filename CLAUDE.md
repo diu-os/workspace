@@ -109,10 +109,11 @@ For architecture decisions and migration patterns, see `ARCHITECTURE.md`.
 - **Q-15 Phase 3+4 ✅ ЗАКРЫТО** — хуки + SimulationCanvas (commit `ed9bb49`):
   `useSimulationState` (17 useState + handlers), `SimulationCanvas`, `CanvasOverlayInfo`
   App.tsx: 483 → **170 строк** (итого: 1357 → 170). Q-15 инвариант закрыт: все компоненты < 200 строк.
+- **ADR D-030 ✅** — ORCID Verification Queue + Fallback (Gap #3, 15 Mar 2026)
 
 ### Открыто — P0 (блокирует Phase 3)
 - **Security review с Кириллом** — code audit nonces/pause/ORCID (P-008/P-009 ещё открыты)
-- **Gap #3**: ORCID verification queue + fallback (R-3) ← **следующий приоритет**
+- **Gap #3 (реализация)**: `validate_orcid_format` в registry.rs + backend orcid_verifier worker ← **следующий приоритет**
 
 ### Открыто — P1
 - Backend API: Axum + alloy + SIWE auth + PostgreSQL (B-1..B-3)
