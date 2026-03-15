@@ -110,14 +110,17 @@ For architecture decisions and migration patterns, see `ARCHITECTURE.md`.
   `useSimulationState` (17 useState + handlers), `SimulationCanvas`, `CanvasOverlayInfo`
   App.tsx: 483 → **170 строк** (итого: 1357 → 170). Q-15 инвариант закрыт: все компоненты < 200 строк.
 - **ADR D-030 ✅** — ORCID Verification Queue + Fallback (Gap #3, 15 Mar 2026)
+- **ADR D-031 ✅** — Backend Architecture: Axum + SIWE + PostgreSQL (commit `08b425f`)
+- **B-1 инфраструктура ✅** — config, error, db, AppState, SIWE auth, JWT middleware, migrations (commit `4f2d2ad`)
+- **B-1 DDD структура ✅** — simulations, progress, registry, reputation bounded contexts (commit `7aa68d9`)
+- **B-2 ORCID worker ✅** — OrcidVerifier poll loop, alloy on-chain `verify_researcher`, exponential backoff 1m→5m→15m→1h→4h (commit `14644c2`)
+- **Gap #3 on-chain ✅** — `validate_orcid_format` в registry.rs, `InvalidOrcidFormat` error (commit `377e5bb`)
 
 ### Открыто — P0 (блокирует Phase 3)
 - **Security review с Кириллом** — code audit nonces/pause/ORCID (P-008/P-009 ещё открыты)
-- **Gap #3 (реализация)**: `validate_orcid_format` в registry.rs + backend orcid_verifier worker ← **следующий приоритет**
 
 ### Открыто — P1
-- Backend API: Axum + alloy + SIWE auth + PostgreSQL (B-1..B-3)
-- MCP Physics Server stub параллельно с B-3 (ADR D-020)
+- **B-3 MCP Physics Server stub** (ADR D-020) ← **следующий приоритет**
 - Stylus Sprint grant application (Apr 2026 deadline)
 - Gitcoin GG25 draft (AI For Public Goods) + builder.gitcoin.co профиль
 - Оптимизировать Gitcoin Passport (passport.gitcoin.co)
