@@ -405,6 +405,69 @@ Branded AI tutor — единая точка взаимодействия для
 
 ---
 
+### D-031: Backend Architecture — Axum + SIWE + PostgreSQL (15 Mar 2026)
+**Context:**
+Три критических компонента Phase 2 блокированы отсутствием production backend:
+1. **orcid_verifier worker** (ADR D-030): должен слушать `OrcidLinked` events → ORCID public API → `verify_researcher`. Без backend нет event listener и нет HTTP-клиента для pub.orcid.org.
+2. **MCP Physics Server stub** (ADR D-020): capability window — инфраструктура должна быть готова до Q3 2026, иначе теряем точку входа в AI Research Loop. Stub требует запущенного сервера.
+3. **SIWE auth + alloy**: frontend не может безопасно взаимодействовать с контрактами без off-chain подписи и верификации. On-chain вызовы нельзя проксировать через клиент без приватного ключа в браузере.
+
+Текущий stub (`physics-tutorial/backend/`) — заглушка на Axum 0.7, не в prod, без БД и auth.
+
+**Options Considered:**
+
+| Вариант | Описание | Pros | Cons |
+|---------|----------|------|------|
+| A | **Centralized Axum REST API** (монолит, DDD структура) | Rust везде; полный контроль; DDD изолирует bounded contexts; PostgreSQL = единый source of truth | Single point of failure; горизонтальное масштабирование требует stateless дизайна |
+| B | **Serverless** (AWS Lambda / Cloudflare Workers) | Zero ops; автоматическое масштабирование | Cold start latency несовместима с <2s SLO (D-018); Workers — JS/WASM, не idiomatic Rust; vendor lock-in; сложно дебажить event pipeline |
+| C | **The Graph subgraph** (только чтение) | Децентрализованный индекс on-chain событий | Read-only — не решает проблему orcid_verifier (нужна запись); нет SIWE, нет PostgreSQL; не заменяет backend, только дополняет |
+
+**Decision:** Вариант A — Axum 0.7 + SIWE + PostgreSQL (SQLx), развёрнутый в три итерации (B-1 → B-3):
+
+**B-1 (текущий спринт):** Базовый production Axum сервер с DDD структурой:
+- Crate: `physics-tutorial/backend/` рефакторить в полноценный Axum 0.7 сервер
+- DDD bounded contexts: `auth/`, `registry/`, `reputation/`, `progress/`
+- PostgreSQL (SQLx) — schema: `users`, `sessions`, `orcid_verification_queue`
+- SIWE: верификация подписи (`Sign-In with Ethereum`, EIP-4361) → JWT-сессия с TTL
+- Health endpoint: `GET /health` (readiness для деплоя)
+- `orcid_verification_queue` table: `(address, orcid_id, status, attempts, next_retry_at)` — статусы `pending → verified | rejected | failed`, max retries = 5
+
+**B-2 (параллельно с B-1):** alloy интеграция + event listener:
+- alloy 0.7 provider → Arbitrum Sepolia WebSocket endpoint
+- Listener: `OrcidLinked` event → enqueue в `orcid_verification_queue`
+- orcid_verifier worker: dequeue → `pub.orcid.org/v3.0` API → `verify_researcher` on-chain call
+- Exponential backoff (1m → 5m → 15m → 1h → 4h), после 5 попыток — `rejected` + alert
+
+**B-3 (параллельно, ADR D-020):** MCP Physics Server stub:
+- Отдельный Axum router `/mcp/` или отдельный бинарь
+- MCP protocol: JSON-RPC 2.0, инструменты `simulate_quantum_tunneling`, `simulate_hydrogen`, `get_progress`
+- API-контракт фиксируется сейчас; реализация — Phase 3
+- PostgreSQL shared — MCP читает progress данные из той же БД
+
+Вариант B отклонён: cold start несовместим с <2s SLO (D-018); event pipeline (orcid_verifier, alloy listener) не подходит для serverless.
+Вариант C отклонён: read-only, нет auth, нет worker — не закрывает ни один из трёх блокеров.
+
+**Consequence:**
+1. `physics-tutorial/backend/` становится production-grade сервисом — полноценный `Cargo.toml`, не заглушка
+2. CLAUDE.md Tech Stack — Backend строка: `Axum 0.7, SQLx, PostgreSQL, alloy 0.7, SIWE (EIP-4361)`
+3. ROADMAP.md B-1..B-3 структура сохраняется; B-2 и B-3 выполняются параллельно с B-1
+4. Event schema (`OrcidLinked`, `XPAdded`, `SimulationRecorded`) фиксируется в Phase 2 — избегаем рефакторинга при переходе на S3-native streaming в Phase 3 (ADR D-024)
+5. SIWE убирает необходимость хранить приватные ключи на frontend; backend подписывает on-chain транзакции через alloy + deployer key (только для `verify_researcher`)
+6. Новый вектор атаки: SIWE replay attack — митигируется nonce в challenge message + короткий TTL сессии (24h)
+
+**Security:**
+- Все endpoints: HTTPS only (TLS termination на reverse proxy — nginx/Caddy)
+- SIWE challenge: server-generated nonce, одноразовый, TTL = 5 минут
+- JWT: HS256 или RS256, TTL = 24h, refresh token в httpOnly cookie
+- Rate limiting: `POST /auth/challenge` и `POST /auth/verify` — 10 req/min per IP
+- `verify_researcher` on-chain call: только с backend, deployer key в env var (не в коде)
+- ORCID API calls: только с backend — ORCID id не раскрывается клиенту до верификации
+- PostgreSQL: параметризованные запросы (SQLx компилирует запросы статически — SQL injection невозможен)
+
+**Phase:** Phase 2. B-1 — текущий спринт. B-2/B-3 — параллельно. Полный backend — до деплоя на mainnet (Phase 3).
+
+---
+
 ### D-025: No Proxy Through Phase 3; Mainnet Decision Deferred to May 2026 (04 Mar 2026)
 **Context**: P-005 analyzed across multiple sources (DeepSeek, ChatGPT, Gemini).
   Stylus SDK 0.10.0 does NOT support `delegatecall` between WASM contracts natively.

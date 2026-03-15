@@ -38,7 +38,7 @@ Deployer: `0x67bB4D1895D9A736F9e6076529B468ba05aeD150` | Total: **171 tests**
 |-----------|-------|
 | Contracts | Rust 1.93, stylus-sdk 0.10.0, alloy 0.7, wasm32-unknown-unknown |
 | Frontend | React 18, Three.js 0.158, Vite 6.4, Tailwind 3.3, TypeScript 5.2 |
-| Backend | Axum 0.7 (stub in physics-tutorial/backend/, not prod) |
+| Backend | Axum 0.7, SQLx, PostgreSQL, alloy 0.7, SIWE (EIP-4361) — B-1 in progress |
 | Tooling | cargo-stylus, mini-alloc 1.0 |
 
 ## Project Structure
